@@ -535,32 +535,126 @@ public class TestDominoRole extends TestCase {
         dominoUser.setAcl(userACL);
         dominoUser.create("user", "password");
 
+        Assert.assertNotNull(adminUser.getRoles());
+        Assert.assertFalse(adminUser.getRoles().isEmpty());
+
         adminUser.login("admin", "password");
         String authToken = adminUser.getAuthToken();
-        System.out.println("ADMIN TOKEN: " + authToken);
-        System.out.println("ADMIN TOKEN: " + Domino.getAuthToken());
+
+        Assert.assertNotNull(authToken);
+        Assert.assertNotNull(Domino.getAuthToken());
+
+        System.out.println("Updating...");
 
         dominoUser.update("new_username", "new_password");
+        Assert.assertEquals("new_username", dominoUser.getUsername());
     }
 
-
-    public void testDeleteRole() {
-        // Create Role
+    @Test
+    public void testDeletePublicRole() {
         TestApplication application = TestData.getNewApplication();
         Domino.initialize(application.getAppId(), application.getApiToken());
 
-        String random = UUID.randomUUID().toString();
-
-        DominoRole role = new DominoRole("test" + random);
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadWrite());
         role.create();
 
-        role.retrieve();
         Assert.assertNotNull(role.getEntityId());
 
         role.delete();
 
         role.retrieve();
 
+        Assert.assertNull(role.getEntityId());
+    }
+
+    @Test
+    public void testDeletePublicRoleWithAuthToken() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken());
+
+
+        DominoUser adminUser = new DominoUser();
+        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        adminUser.create("admin", "password");
+
+        adminUser.login("admin", "password");
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadWrite());
+        role.create();
+
+        Assert.assertNotNull(role.getEntityId());
+
+        adminUser.login("admin", "password");
+
+        role.delete();
+
+        role.retrieve();
+
+        Assert.assertNull(role.getEntityId());
+    }
+
+    @Test
+    public void testDeletePublicRoleWithMasterKey() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadWrite());
+        role.create();
+
+        Assert.assertNotNull(role.getEntityId());
+
+        role.delete();
+
+        role.retrieve();
+
+        Assert.assertNull(role.getEntityId());
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testDeleteRoleWithACLWithAuthToken() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken());
+
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        role.create();
+
+        String adminRoleId = role.getEntityId();
+
+        DominoUser adminUser = new DominoUser();
+        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        adminUser.getRoles().add(role);
+        adminUser.create("admin", "password");
+
+        Assert.assertNotNull(adminUser.getRoles());
+        Assert.assertFalse(adminUser.getRoles().isEmpty());
+
+        adminUser.login("admin", "password");
+        String authToken = adminUser.getAuthToken();
+
+        Assert.assertNotNull(authToken);
+        Assert.assertNotNull(Domino.getAuthToken());
+
+        role.delete();
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void testDeleteRoleWithACLWithoutAuthToken() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken());
+
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        role.create();
+
+        DominoUser adminUser = new DominoUser();
+        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        adminUser.getRoles().add(role);
+        adminUser.create("admin", "password");
+
+        role.delete();
     }
 
 }

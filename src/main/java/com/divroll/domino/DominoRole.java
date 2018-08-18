@@ -246,9 +246,16 @@ public class DominoRole extends DominoBase {
                 httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getApiKey());
             }
             HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
-            if(response.getStatus() >= 400) {
+            if(response.getStatus() >= 500) {
                 throwException(response);
-            } else if(response.getStatus() == 200) {
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throwException(response);
+            } else if(response.getStatus() == 204) {
+                setEntityId(null);
+                setAcl(null);
+                setName(name);
                 return true;
             }
         } catch (UnirestException e) {
@@ -276,7 +283,6 @@ public class DominoRole extends DominoBase {
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
-            System.out.println(response.getBody().toString());
 
             if(response.getStatus() >= 500) {
                 throwException(response);
