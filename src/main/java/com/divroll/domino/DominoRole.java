@@ -168,7 +168,7 @@ public class DominoRole extends DominoBase {
             httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println(body.toString());
+            System.out.println("REQUEST: " + body.toString());
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
             if(response.getStatus() >= 500) {

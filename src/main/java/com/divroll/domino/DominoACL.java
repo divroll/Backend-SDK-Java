@@ -61,6 +61,15 @@ public class DominoACL {
         return dominoALC;
     }
 
+    public static DominoACL buildPublicReadMasterKeyWrite() {
+        DominoACL dominoALC = new DominoACL();
+        dominoALC.setPublicWrite(false);
+        dominoALC.setPublicRead(true);
+        dominoALC.setAclRead(null);
+        dominoALC.setAclWrite(null);
+        return dominoALC;
+    }
+
     public Boolean getPublicRead() {
         return publicRead;
     }
