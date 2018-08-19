@@ -1,7 +1,6 @@
 package com.divroll.domino;
 
 import com.divroll.domino.exception.BadRequestException;
-import com.divroll.domino.exception.InvalidEntityException;
 import com.divroll.domino.exception.UnauthorizedException;
 import junit.framework.TestCase;
 import org.junit.Assert;
@@ -262,7 +261,7 @@ public class TestDominoUser extends TestCase {
         Assert.assertTrue(dominoUser.getAcl().getPublicWrite());
     }
 
-    @Test(expected = InvalidEntityException.class)
+    @Test(expected = BadRequestException.class)
     public void testUpdateUserWithACLMissingAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
         Domino.initialize(application.getAppId(), application.getApiToken());
@@ -450,7 +449,7 @@ public class TestDominoUser extends TestCase {
         adminUser.create("admin", "password");
     }
 
-    @Test(expected = InvalidEntityException.class)
+    @Test(expected = BadRequestException.class)
     public void testCreateUserWithRolesThenUpdateRoleWithoutAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
         Domino.initialize(application.getAppId(), application.getApiToken());

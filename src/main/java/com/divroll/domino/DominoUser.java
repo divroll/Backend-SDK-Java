@@ -2,7 +2,6 @@ package com.divroll.domino;
 
 import com.divroll.domino.exception.BadRequestException;
 import com.divroll.domino.exception.DominoException;
-import com.divroll.domino.exception.InvalidEntityException;
 import com.divroll.domino.exception.UnauthorizedException;
 import com.divroll.domino.helper.JSON;
 import com.mashape.unirest.http.HttpResponse;
@@ -363,7 +362,7 @@ public class DominoUser extends DominoBase {
             if(response.getStatus() >= 500) {
                 throw new DominoException(response.getStatusText());
             } else if(response.getStatus() == 400) {
-                throw new InvalidEntityException(response.getStatusText());
+                throw new BadRequestException(response.getStatusText());
             } else if(response.getStatus() == 401) {
                 throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() == 404) {

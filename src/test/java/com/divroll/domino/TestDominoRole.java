@@ -1,7 +1,6 @@
 package com.divroll.domino;
 
 import com.divroll.domino.exception.BadRequestException;
-import com.divroll.domino.exception.InvalidEntityException;
 import com.divroll.domino.exception.UnauthorizedException;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -36,7 +35,7 @@ public class TestDominoRole extends TestCase {
         role.retrieve();
     }
 
-    @Test(expected = InvalidEntityException.class)
+    @Test(expected = BadRequestException.class)
     public void testCreateRoleInvalidACLShouldThrowException() {
         TestApplication application = TestData.getNewApplication();
         Domino.initialize(application.getAppId(), application.getApiToken());
@@ -450,7 +449,7 @@ public class TestDominoRole extends TestCase {
         adminUser.create("admin", "password");
     }
 
-    @Test(expected = UnauthorizedException.class)
+    @Test(expected = BadRequestException.class)
     public void testCreateUserWithRolesThenUpdateRoleWithoutAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
         Domino.initialize(application.getAppId(), application.getApiToken());
