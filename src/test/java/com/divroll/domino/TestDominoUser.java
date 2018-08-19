@@ -9,9 +9,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.omg.IOP.CodecPackage.InvalidTypeForEncoding;
-
-import java.io.InvalidClassException;
 import java.util.Arrays;
 
 @RunWith(JUnit4.class)

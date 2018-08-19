@@ -509,7 +509,8 @@ public class DominoUser extends DominoBase {
         } catch (UnirestException e) {
             e.printStackTrace();
         }
-        return false;    }
+        return false;
+    }
 
     public void login(String username, String password) {
         setUsername(username);
