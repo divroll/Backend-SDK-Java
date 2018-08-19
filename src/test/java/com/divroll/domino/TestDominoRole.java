@@ -562,6 +562,20 @@ public class TestDominoRole extends TestCase {
         Assert.assertNotNull(role.getEntityId());
 
         role.delete();
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void testDeletePublicRoleThenRetrieveShouldFail() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken());
+
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadWrite());
+        role.create();
+
+        Assert.assertNotNull(role.getEntityId());
+
+        role.delete();
 
         role.retrieve();
 
@@ -588,6 +602,28 @@ public class TestDominoRole extends TestCase {
         adminUser.login("admin", "password");
 
         role.delete();
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void testDeletePublicRoleWithAuthTokenThenRetrieveShouldFail() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken());
+
+
+        DominoUser adminUser = new DominoUser();
+        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        adminUser.create("admin", "password");
+
+        adminUser.login("admin", "password");
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadWrite());
+        role.create();
+
+        Assert.assertNotNull(role.getEntityId());
+
+        adminUser.login("admin", "password");
+
+        role.delete();
 
         role.retrieve();
 
@@ -596,6 +632,20 @@ public class TestDominoRole extends TestCase {
 
     @Test
     public void testDeletePublicRoleWithMasterKey() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+
+        DominoRole role = new DominoRole("Admin");
+        role.setAcl(DominoACL.buildPublicReadWrite());
+        role.create();
+
+        Assert.assertNotNull(role.getEntityId());
+
+        role.delete();
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void testDeletePublicRoleWithMasterKeyTheRetrieveShouldFail() {
         TestApplication application = TestData.getNewApplication();
         Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 

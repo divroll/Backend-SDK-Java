@@ -46,7 +46,9 @@ public class DominoUser extends DominoBase {
             if(Domino.getApiKey() != null) {
                 httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
             }
-
+            if(Domino.getAuthToken() != null) {
+                httpRequestWithBody.header("X-Domino-Auth-Key", Domino.getAuthToken());
+            }
             JSONObject user = new JSONObject();
             user.put("username", username);
             user.put("password", password);
@@ -83,10 +85,10 @@ public class DominoUser extends DominoBase {
 
             System.out.println("RESPONSE: " + response.getBody().toString());
 
-            if(response.getStatus() == 404) {
-
+            if(response.getStatus() >= 500) {
+                throwException(response);
             } else if(response.getStatus() == 401) {
-
+                throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() == 201) {
                 JsonNode responseBody = response.getBody();
                 JSONObject bodyObj = responseBody.getObject();
@@ -95,6 +97,79 @@ public class DominoUser extends DominoBase {
                 String webToken = responseUser.getString("webToken");
                 setEntityId(entityId);
                 setAuthToken(webToken);
+
+                List<String> aclWriteList = null;
+                List<String> aclReadList = null;
+
+                Boolean publicRead = null;
+                Boolean publicWrite = null;
+
+                try {
+                    publicRead = user.get("publicRead") != null ? user.getBoolean("publicRead") : null;
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    publicWrite = user.get("publicWrite") != null ? user.getBoolean("publicWrite") : null;
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    aclWriteList = JSON.toList(user.getJSONArray("aclWrite"));
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    aclReadList = JSON.toList(user.getJSONArray("aclRead"));
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    aclWriteList = Arrays.asList(user.getString("aclWrite"));
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    aclReadList = Arrays.asList(user.getString("aclRead"));
+                } catch (Exception e) {
+
+                }
+
+                List<DominoRole> dominoRoles = null;
+                try {
+                    Object rolesObj = user.get("roles");
+                    if(roles instanceof JSONArray) {
+                        dominoRoles = new LinkedList<DominoRole>();
+                        JSONArray jsonArray = (JSONArray) roles;
+                        for(int i=0;i<jsonArray.length();i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            String roleId = jsonObject.getString("entityId");
+                            DominoRole dominoRole = new DominoRole();
+                            dominoRole.setEntityId(roleId);
+                            dominoRoles.add(dominoRole);
+                        }
+                    } else if(rolesObj instanceof JSONObject) {
+                        dominoRoles = new LinkedList<DominoRole>();
+                        JSONObject jsonObject = (JSONObject) rolesObj;
+                        String roleId = jsonObject.getString("entityId");
+                        DominoRole dominoRole = new DominoRole();
+                        dominoRole.setEntityId(roleId);
+                        dominoRoles.add(dominoRole);
+                    }
+                } catch (Exception e) {
+                    // do nothing
+                }
+
+                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                acl.setPublicWrite(publicWrite);
+                acl.setPublicRead(publicRead);
+                setAcl(acl);
+                setRoles(dominoRoles);
 
             }
         } catch (UnirestException e) {
@@ -201,7 +276,7 @@ public class DominoUser extends DominoBase {
                         dominoRoles.add(dominoRole);
                     }
                 } catch (Exception e) {
-
+                    // do nothing
                 }
 
                 DominoACL acl = new DominoACL(aclReadList, aclWriteList);
@@ -291,10 +366,17 @@ public class DominoUser extends DominoBase {
                 JSONObject bodyObj = responseBody.getObject();
                 JSONObject responseUser = bodyObj.getJSONObject("user");
                 String entityId = responseUser.getString("entityId");
-                String webToken = responseUser.getString("webToken");
-                String username = responseUser.getString("username");
+                //String webToken = responseUser.getString("webToken");
+                String updatedUsername = null;
+
+                try {
+                    updatedUsername = responseUser.getString("username");
+                } catch (Exception e) {
+                    // do nothing
+                }
+
                 setEntityId(entityId);
-                setAuthToken(webToken);
+                //setAuthToken(webToken);
 
                 Boolean publicRead = null;
                 Boolean publicWrite = null;
@@ -367,7 +449,9 @@ public class DominoUser extends DominoBase {
                 acl.setPublicRead(publicRead);
                 acl.setPublicWrite(publicWrite);
                 setEntityId(entityId);
-                setUsername(username);
+                if(newUsername != null) {
+                    setUsername(updatedUsername);
+                }
                 setAcl(acl);
                 setRoles(dominoRoles);
             }
