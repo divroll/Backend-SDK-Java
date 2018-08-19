@@ -49,9 +49,13 @@ public class DominoUser extends DominoBase {
             if(Domino.getAuthToken() != null) {
                 httpRequestWithBody.header("X-Domino-Auth-Key", Domino.getAuthToken());
             }
-            JSONObject user = new JSONObject();
-            user.put("username", username);
-            user.put("password", password);
+            JSONObject userObj = new JSONObject();
+            userObj.put("username", username);
+            userObj.put("password", password);
+            userObj.put("publicRead", (this.acl != null && this.acl.getPublicRead() != null)
+                    ? this.acl.getPublicRead() : JSONObject.NULL);
+            userObj.put("publicWrite", (this.acl != null && this.acl.getPublicWrite() != null)
+                    ? this.acl.getPublicWrite() : JSONObject.NULL);
             JSONObject body = new JSONObject();
 
             JSONArray roles = new JSONArray();
@@ -60,17 +64,17 @@ public class DominoUser extends DominoBase {
                 roleObj.put("entityId", role.getEntityId());
                 roles.put(roleObj);
             }
-            user.put("roles", roles);
+            userObj.put("roles", roles);
 
-            body.put("user", user);
+            body.put("user", userObj);
             httpRequestWithBody.body(body);
             JSONArray aclRead = new JSONArray();
             JSONArray aclWrite = new JSONArray();
-            if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
+            if(this.acl != null) {
+                for(String uuid : this.acl.getAclRead()) {
                     aclRead.put(uuid);
                 }
-                for(String uuid : acl.getAclWrite()) {
+                for(String uuid : this.acl.getAclWrite()) {
                     aclWrite.put(uuid);
                 }
             }
@@ -105,44 +109,46 @@ public class DominoUser extends DominoBase {
                 Boolean publicWrite = null;
 
                 try {
-                    publicRead = user.get("publicRead") != null ? user.getBoolean("publicRead") : null;
+                    publicRead = responseUser.get("publicRead") != null ? responseUser.getBoolean("publicRead") : null;
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    publicWrite = user.get("publicWrite") != null ? user.getBoolean("publicWrite") : null;
+                    publicWrite = responseUser.get("publicWrite") != null ? responseUser.getBoolean("publicWrite") : null;
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = JSON.toList(user.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.toList(responseUser.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(user.getJSONArray("aclRead"));
+                    aclReadList = JSON.toList(responseUser.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = Arrays.asList(user.getString("aclWrite"));
+                    String singleAclWrite = responseUser.getString("aclWrite");
+                    aclWriteList = Arrays.asList(singleAclWrite);
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = Arrays.asList(user.getString("aclRead"));
+                    String singleAclRead = responseUser.getString("aclRead");
+                    aclReadList = Arrays.asList(singleAclRead);
                 } catch (Exception e) {
 
                 }
 
                 List<DominoRole> dominoRoles = null;
                 try {
-                    Object rolesObj = user.get("roles");
+                    Object rolesObj = responseUser.get("roles");
                     if(roles instanceof JSONArray) {
                         dominoRoles = new LinkedList<DominoRole>();
                         JSONArray jsonArray = (JSONArray) roles;
@@ -312,13 +318,17 @@ public class DominoUser extends DominoBase {
             if(Domino.getAuthToken() != null) {
                 httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getAuthToken());
             }
-            JSONObject user = new JSONObject();
+            JSONObject userObj = new JSONObject();
             if(username != null) {
-                user.put("username", newUsername);
+                userObj.put("username", newUsername);
             }
             if(username != null) {
-                user.put("password", newPassword);
+                userObj.put("password", newPassword);
             }
+            userObj.put("publicRead", (acl != null && acl.getPublicRead() != null)
+                    ? acl.getPublicRead() : JSONObject.NULL);
+            userObj.put("publicWrite", (acl != null && acl.getPublicWrite() != null)
+                    ? acl.getPublicWrite() : JSONObject.NULL);
             JSONObject body = new JSONObject();
 
             JSONArray roles = new JSONArray();
@@ -327,9 +337,9 @@ public class DominoUser extends DominoBase {
                 roleObj.put("entityId", role.getEntityId());
                 roles.put(roleObj);
             }
-            user.put("roles", roles);
+            userObj.put("roles", roles);
 
-            body.put("user", user);
+            body.put("user", userObj);
 
             JSONArray aclRead = new JSONArray();
             JSONArray aclWrite = new JSONArray();
@@ -422,7 +432,7 @@ public class DominoUser extends DominoBase {
 
                 List<DominoRole> dominoRoles = null;
                 try {
-                    Object roleObjects = user.get("roles");
+                    Object roleObjects = userObj.get("roles");
                     if(roleObjects instanceof JSONArray) {
                         dominoRoles = new LinkedList<DominoRole>();
                         JSONArray jsonArray = (JSONArray) roles;
@@ -464,7 +474,43 @@ public class DominoUser extends DominoBase {
         update(null, null);
     }
 
-    public boolean delete() { return  false; }
+    public boolean delete() {
+        try {
+            HttpRequestWithBody httpRequestWithBody = Unirest.delete(Domino.getServerUrl()
+                    + usersUrl + "/" + getEntityId());
+            if(Domino.getMasterKey() != null) {
+                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+            }
+            if(Domino.getAppId() != null) {
+                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+            }
+            if(Domino.getApiKey() != null) {
+                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+            }
+            if(Domino.getAuthToken() != null) {
+                httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getAuthToken());
+            }
+            HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
+            if(response.getStatus() >= 500) {
+                throwException(response);
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throwException(response);
+            } else if(response.getStatus() == 204) {
+                setEntityId(null);
+                setAcl(null);
+                setUsername(null);
+                setRoles(null);
+                setAcl(null);
+                setPassword(null);
+                setAuthToken(null);
+                return true;
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return false;    }
 
     public void login(String username, String password) {
         setUsername(username);
@@ -486,7 +532,7 @@ public class DominoUser extends DominoBase {
             if(response.getStatus() == 404) {
 
             } else if(response.getStatus() == 401) {
-
+                throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() == 200) {
                 JsonNode body = response.getBody();
                 JSONObject bodyObj = body.getObject();
