@@ -27,6 +27,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.fluttercode.datafactory</groupId>
+      <artifactId>datafactory</artifactId>
+      <version>0.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>4.5.3</version>
