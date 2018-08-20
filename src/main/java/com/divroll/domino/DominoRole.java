@@ -89,8 +89,21 @@ public class DominoRole extends DominoBase {
                 JSONObject role = bodyObj.getJSONObject("role");
                 String entityId = role.getString("entityId");
                 String name = role.getString("name");
-                Boolean publicRead = role.getBoolean("publicRead");
-                Boolean publicWrite = role.getBoolean("publicWrite");
+
+                Boolean publicRead = null;
+                Boolean publicWrite = null;
+
+                try {
+                    publicRead = role.getBoolean("publicRead");
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    publicWrite = role.getBoolean("publicWrite");
+                } catch (Exception e) {
+
+                }
 
                 List<String> aclWriteList = null;
                 List<String> aclReadList = null;
@@ -102,13 +115,13 @@ public class DominoRole extends DominoBase {
                 }
 
                 try {
-                    aclReadList = JSON.toList(role.getJSONArray("aclRead"));
+                    aclWriteList = Arrays.asList(role.getString("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = Arrays.asList(role.getString("aclWrite"));
+                    aclReadList = JSON.toList(role.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }

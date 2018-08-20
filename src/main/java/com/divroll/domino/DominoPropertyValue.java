@@ -5,8 +5,8 @@ import com.divroll.domino.exception.UnsupportedPropertyValueException;
 public class DominoPropertyValue {
     private Object value = null;
     public DominoPropertyValue(Object value) {
-        System.out.println(value.getClass().getName()); //java.lang.String
-        System.out.println(String.class.getName());     //java.lang.String
+//        System.out.println(value.getClass().getName()); //java.lang.String
+//        System.out.println(String.class.getName());     //java.lang.String
         if(!value.getClass().getName().equalsIgnoreCase(String.class.getName())
                 || !value.getClass().getName().equalsIgnoreCase(Boolean.class.getName())
                 || !value.getClass().getName().equalsIgnoreCase(Integer.class.getName())
