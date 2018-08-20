@@ -81,6 +81,8 @@ public class DominoRoles extends DominoBase {
                 throwException(response);
             } else if(response.getStatus() == 200) {
 
+                getRoles().clear();
+
                 JsonNode body = response.getBody();
                 JSONObject bodyObj = body.getObject();
                 JSONObject roles = bodyObj.getJSONObject("roles");

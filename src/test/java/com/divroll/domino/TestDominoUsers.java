@@ -126,7 +126,6 @@ public class TestDominoUsers extends TestCase {
         users.query();
 
         Assert.assertEquals(30, users.getUsers().size());
-
     }
 
 }

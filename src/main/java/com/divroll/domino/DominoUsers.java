@@ -82,6 +82,8 @@ public class DominoUsers extends DominoBase {
                 throwException(response);
             } else if(response.getStatus() == 200) {
 
+                getUsers().clear();
+
                 JsonNode body = response.getBody();
 
                 System.out.println("HERE: " + body.toString());
