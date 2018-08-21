@@ -5,6 +5,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+
 public class DominoBase {
     public void throwException(HttpResponse<JsonNode> response) {
         JsonNode body = response.getBody();

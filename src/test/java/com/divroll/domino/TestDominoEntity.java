@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 @RunWith(JUnit4.class)
@@ -658,7 +660,7 @@ public class TestDominoEntity extends TestCase {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void testDeleteUserWithACLWithoutAuthToken() {
+    public void testDeleteEntityWithACLWithoutAuthToken() {
         TestApplication application = TestData.getNewApplication();
         Domino.initialize(application.getAppId(), application.getApiToken());
 
@@ -690,6 +692,51 @@ public class TestDominoEntity extends TestCase {
         userProfile.delete();
     }
 
+    @Test
+    public void testSetEntityBlob() throws UnsupportedEncodingException {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken());
+
+        DominoRole adminRole = new DominoRole("Admin");
+        adminRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        adminRole.create();
+
+        DominoUser adminUser = new DominoUser();
+        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        adminUser.getRoles().add(adminRole);
+        adminUser.create("admin", "password");
+
+        DominoEntity userProfile = new DominoEntity("UserProfile");
+        userProfile.setProperty("nickname", "Johnny");
+        userProfile.setProperty("age", 30);
+        DominoACL acl = new DominoACL();
+        acl.setAclWrite(Arrays.asList(adminRole.getEntityId()));
+        userProfile.setAcl(acl);
+
+        userProfile.create();
+
+        Assert.assertNotNull(userProfile.getEntityId());
+        Assert.assertNotNull(userProfile.getAcl().getAclWrite().contains(adminRole.getEntityId()));
+
+        adminUser.login("admin", "password");
+        Assert.assertNotNull(adminUser.getAuthToken());
+        Assert.assertNotNull(Domino.getAuthToken());
+
+        try {
+            userProfile.setBlobProperty("picture", "this is a picture".getBytes("utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        byte[] blob = userProfile.getBlobProperty("picture");
+
+        Assert.assertNotNull(blob);
+        Assert.assertEquals("this is a picture", new String(blob, "utf-8"));
+
+        userProfile.deleteBlobProperty("picture");
+
+        userProfile.delete();
+    }
 
 
 }

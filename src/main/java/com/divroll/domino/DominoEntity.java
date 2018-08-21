@@ -28,6 +28,8 @@ public class DominoEntity extends DominoBase {
     private DominoACL acl;
     private JSONObject entityObj = new JSONObject();
 
+    private DominoEntity() {}
+
     public DominoEntity(String entityStore) {
         entityStoreBase = entityStoreBase + entityStore;
     }
@@ -49,14 +51,18 @@ public class DominoEntity extends DominoBase {
                 getRequest.header("X-Domino-Auth-Token", Domino.getAuthToken());
             }
 
-
             HttpResponse<InputStream> response = getRequest.asBinary();
 
             if(response.getStatus() >= 500) {
-
-            }
-            if(response.getStatus() >= 400) {
-
+                throw new DominoException("Internal Server error"); // TODO
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throw new DominoException("Client error"); // TODO
             } else if(response.getStatus() == 200) {
                 InputStream is = response.getBody();
                 byte[] bytes = ByteStreams.toByteArray(is);
@@ -75,7 +81,7 @@ public class DominoEntity extends DominoBase {
             throw new DominoException("Save the entity first before setting a Blob property");
         }
         try {
-            HttpRequestWithBody httpRequestWithBody = Unirest.put(Domino.getServerUrl()
+            HttpRequestWithBody httpRequestWithBody = Unirest.post(Domino.getServerUrl()
                     + entityStoreBase + "/" + getEntityId() + "/blobs/" + blobKey);
             if(Domino.getMasterKey() != null) {
                 httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
@@ -105,17 +111,60 @@ public class DominoEntity extends DominoBase {
             httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            HttpResponse<JsonNode> response =  httpRequestWithBody.body(value).asJson();
-            if(response.getStatus() >= 400) {
-                throwException(response);
+            HttpResponse<InputStream> response =  httpRequestWithBody.body(value).asBinary();
+            if(response.getStatus() >= 500) {
+                throw new DominoException("Internal Server error"); // TODO
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throw new DominoException("Client error"); // TODO
             } else if(response.getStatus() == 201) {
-                JsonNode responseBody = response.getBody();
-                JSONObject bodyObj = responseBody.getObject();
-                JSONObject role = bodyObj.getJSONObject("role");
-                String entityId = role.getString("entityId");
-                setEntityId(entityId);
+                InputStream responseBody = response.getBody();
             }
         } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteBlobProperty(String blobKey) {
+        try {
+            HttpRequestWithBody getRequest = (HttpRequestWithBody) Unirest.delete(Domino.getServerUrl()
+                    + entityStoreBase + "/" + getEntityId() + "/blobs/" + blobKey);
+            if(Domino.getMasterKey() != null) {
+                getRequest.header("X-Domino-Master-Key", Domino.getMasterKey());
+            }
+            if(Domino.getAppId() != null) {
+                getRequest.header("X-Domino-App-Id", Domino.getAppId());
+            }
+            if(Domino.getApiKey() != null) {
+                getRequest.header("X-Domino-Api-Key", Domino.getApiKey());
+            }
+            if(Domino.getAuthToken() != null) {
+                getRequest.header("X-Domino-Auth-Token", Domino.getAuthToken());
+            }
+
+            HttpResponse<InputStream> response = getRequest.asBinary();
+
+            if(response.getStatus() >= 500) {
+                throw new DominoException("Internal Server error"); // TODO
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throw new DominoException("Client error"); // TODO
+            } else if(response.getStatus() == 200) {
+
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -132,6 +181,12 @@ public class DominoEntity extends DominoBase {
     public Object getProperty(String propertyName) {
         return entityObj.get(propertyName);
     }
+
+    public void addLink(String linkName, String entityId) {}
+
+    public void removeLink(String linkName, String entityId) {}
+
+    public void removeLinks(String linkName) {}
 
     public DominoACL getAcl() {
         return acl;
