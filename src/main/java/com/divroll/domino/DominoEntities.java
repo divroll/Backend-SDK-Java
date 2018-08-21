@@ -65,16 +65,16 @@ public class DominoEntities extends DominoBase {
                     + entityStoreUrl);
 
             if(Domino.getMasterKey() != null) {
-                getRequest.header("X-Domino-Master-Key", Domino.getMasterKey());
+                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                getRequest.header("X-Domino-App-Id", Domino.getAppId());
+                getRequest.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                getRequest.header("X-Domino-Api-Key", Domino.getApiKey());
+                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                getRequest.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();

@@ -34,13 +34,13 @@ public class DominoRole extends DominoBase {
         try {
             HttpRequestWithBody httpRequestWithBody = Unirest.post(Domino.getServerUrl() + rolesUrl);
             if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
             }
 
             JSONObject roleObj = new JSONObject();
@@ -147,13 +147,13 @@ public class DominoRole extends DominoBase {
         try {
             HttpRequestWithBody httpRequestWithBody = Unirest.put(Domino.getServerUrl() + rolesUrl + "/" + getEntityId());
             if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
             }
 
             JSONObject roleObj = new JSONObject();
@@ -246,16 +246,16 @@ public class DominoRole extends DominoBase {
             HttpRequestWithBody httpRequestWithBody = Unirest.delete(Domino.getServerUrl()
                     + rolesUrl + "/" + getEntityId());
             if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getApiKey());
             }
             HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
             if(response.getStatus() >= 500) {
@@ -282,16 +282,16 @@ public class DominoRole extends DominoBase {
                     + rolesUrl + "/" + getEntityId());
 
             if(Domino.getMasterKey() != null) {
-                getRequest.header("X-Domino-Master-Key", Domino.getMasterKey());
+                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                getRequest.header("X-Domino-App-Id", Domino.getAppId());
+                getRequest.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                getRequest.header("X-Domino-Api-Key", Domino.getApiKey());
+                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                getRequest.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();

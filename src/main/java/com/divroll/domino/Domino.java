@@ -8,6 +8,8 @@ public class Domino {
     private static String _masterKey;
     private static String _authToken;
 
+    private Domino() {}
+
     public static void initialize(String appId, String apiKey) {
         _appId = appId;
         _apiKey = apiKey;

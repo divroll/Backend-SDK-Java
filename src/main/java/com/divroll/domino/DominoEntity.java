@@ -39,16 +39,16 @@ public class DominoEntity extends DominoBase {
             GetRequest getRequest = (GetRequest) Unirest.get(Domino.getServerUrl()
                     + entityStoreBase + "/" + getEntityId() + "/blobs/" + blobKey);
             if(Domino.getMasterKey() != null) {
-                getRequest.header("X-Domino-Master-Key", Domino.getMasterKey());
+                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                getRequest.header("X-Domino-App-Id", Domino.getAppId());
+                getRequest.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                getRequest.header("X-Domino-Api-Key", Domino.getApiKey());
+                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                getRequest.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
 
             HttpResponse<InputStream> response = getRequest.asBinary();
@@ -84,16 +84,16 @@ public class DominoEntity extends DominoBase {
             HttpRequestWithBody httpRequestWithBody = Unirest.post(Domino.getServerUrl()
                     + entityStoreBase + "/" + getEntityId() + "/blobs/" + blobKey);
             if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
 
             JSONArray aclRead = new JSONArray();
@@ -135,16 +135,16 @@ public class DominoEntity extends DominoBase {
             HttpRequestWithBody getRequest = (HttpRequestWithBody) Unirest.delete(Domino.getServerUrl()
                     + entityStoreBase + "/" + getEntityId() + "/blobs/" + blobKey);
             if(Domino.getMasterKey() != null) {
-                getRequest.header("X-Domino-Master-Key", Domino.getMasterKey());
+                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                getRequest.header("X-Domino-App-Id", Domino.getAppId());
+                getRequest.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                getRequest.header("X-Domino-Api-Key", Domino.getApiKey());
+                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                getRequest.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
 
             HttpResponse<InputStream> response = getRequest.asBinary();
@@ -208,16 +208,16 @@ public class DominoEntity extends DominoBase {
         try {
             HttpRequestWithBody httpRequestWithBody = Unirest.post(Domino.getServerUrl() + entityStoreBase);
             if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
             JSONArray aclReadArray = new JSONArray();
             JSONArray aclWriteArray = new JSONArray();
@@ -274,16 +274,16 @@ public class DominoEntity extends DominoBase {
             String completeUrl = Domino.getServerUrl() + entityStoreBase + "/" + getEntityId();
             HttpRequestWithBody httpRequestWithBody = Unirest.put(completeUrl);
             if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
             JSONArray aclReadArray = new JSONArray();
             JSONArray aclWriteArray = new JSONArray();
@@ -343,16 +343,16 @@ public class DominoEntity extends DominoBase {
             GetRequest getRequest = (GetRequest) Unirest.get(completeUrl);
 
             if(Domino.getMasterKey() != null) {
-                getRequest.header("X-Domino-Master-Key", Domino.getMasterKey());
+                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                getRequest.header("X-Domino-App-Id", Domino.getAppId());
+                getRequest.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                getRequest.header("X-Domino-Api-Key", Domino.getApiKey());
+                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                getRequest.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
@@ -506,16 +506,16 @@ public class DominoEntity extends DominoBase {
             String completeUrl = Domino.getServerUrl() + entityStoreBase + "/" + getEntityId();
             HttpRequestWithBody httpRequestWithBody = Unirest.delete(completeUrl);
             if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header("X-Domino-Master-Key", Domino.getMasterKey());
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
             }
             if(Domino.getAppId() != null) {
-                httpRequestWithBody.header("X-Domino-App-Id", Domino.getAppId());
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header("X-Domino-Api-Key", Domino.getApiKey());
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
             }
             if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header("X-Domino-Auth-Token", Domino.getAuthToken());
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
             }
             HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
             if(response.getStatus() >= 500) {

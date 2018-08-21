@@ -13,10 +13,10 @@ public class TestData {
         try {
             GetRequest getRequest = (GetRequest) Unirest.get(Domino.getServerUrl() + "/applications");
             if(Domino.getAppId() != null) {
-                getRequest.header("X-Domino-App-Id", Domino.getAppId());
+                getRequest.header(DominoBase.HEADER_APP_ID, Domino.getAppId());
             }
             if(Domino.getApiKey() != null) {
-                getRequest.header("X-Domino-Api-Key", Domino.getApiKey());
+                getRequest.header(DominoBase.HEADER_API_KEY, Domino.getApiKey());
             }
             HttpResponse<JsonNode> response = getRequest.asJson();
             if(response.getStatus() == 404) {
