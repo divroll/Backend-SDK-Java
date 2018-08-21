@@ -2,46 +2,54 @@ package com.divroll.domino;
 
 public class Domino {
 
-    private static String serverUrl = "http://localhost:8080/domino";
-    private static String _appId;
-    private static String _apiKey;
-    private static String _masterKey;
-    private static String _authToken;
+    private static String dominoServerUrl = "http://localhost:8080/domino";
+    private static String applicationId;
+    private static String applicationKey;
+    private static String applicationMasterKey;
+    private static String authenticationToken;
 
     private Domino() {}
 
-    public static void initialize(String appId, String apiKey) {
-        _appId = appId;
-        _apiKey = apiKey;
+    public static void initialize(String applicationId, String apiKey) {
+        Domino.applicationId = applicationId;
+        applicationKey = apiKey;
     }
+
     public static void initialize(String appId, String apiKey, String masterKey) {
-        _appId = appId;
-        _apiKey = apiKey;
-        _masterKey = masterKey;
+        applicationId = appId;
+        applicationKey = apiKey;
+        applicationMasterKey = masterKey;
     }
 
     public static String getServerUrl() {
-        return serverUrl;
+        return dominoServerUrl;
+    }
+
+    public static void initialize(String serverUrl, String appId, String apiKey, String masterKey) {
+        applicationId = appId;
+        applicationKey = apiKey;
+        applicationMasterKey = masterKey;
+        dominoServerUrl = serverUrl;
     }
 
     public static String getAppId() {
-        return _appId;
+        return applicationId;
     }
 
     public static String getApiKey() {
-        return _apiKey;
+        return applicationKey;
     }
 
     public static String getMasterKey() {
-        return _masterKey;
+        return applicationMasterKey;
     }
 
     public static String getAuthToken() {
-        return _authToken;
+        return authenticationToken;
     }
 
     public static void setAuthToken(String authToken) {
-        _authToken = authToken;
+        authenticationToken = authToken;
     }
 
 }
