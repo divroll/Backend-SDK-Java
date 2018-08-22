@@ -795,5 +795,79 @@ public class TestDominoEntity extends TestCase {
         userProfile.delete();
     }
 
+    @Test
+    public void testCreateLink() throws UnsupportedEncodingException {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken());
+
+        DominoRole adminRole = new DominoRole("Admin");
+        adminRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        adminRole.create();
+
+        DominoUser adminUser = new DominoUser();
+        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        adminUser.getRoles().add(adminRole);
+        adminUser.create("admin", "password");
+
+        DominoEntity userProfile = new DominoEntity("UserProfile");
+        userProfile.setProperty("nickname", "Johnny");
+        userProfile.setProperty("age", 30);
+        DominoACL acl = new DominoACL();
+        acl.setAclWrite(Arrays.asList(adminRole.getEntityId()));
+        acl.setAclRead(Arrays.asList(adminRole.getEntityId()));
+        userProfile.setAcl(acl);
+
+        userProfile.create();
+
+        Assert.assertNotNull(userProfile.getEntityId());
+        Assert.assertNotNull(userProfile.getAcl().getAclWrite().contains(adminRole.getEntityId()));
+
+        adminUser.login("admin", "password");
+        Assert.assertNotNull(adminUser.getAuthToken());
+        Assert.assertNotNull(Domino.getAuthToken());
+
+        try {
+            userProfile.setBlobProperty("picture", "this is a picture".getBytes("utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        byte[] blob = userProfile.getBlobProperty("picture");
+
+        Assert.assertNotNull(blob);
+        Assert.assertEquals("this is a picture", new String(blob, "utf-8"));
+
+        userProfile.deleteBlobProperty("picture");
+
+
+        try {
+            userProfile.addLink("user", adminUser.getEntityId());
+            userProfile.retrieve();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertNotNull(userProfile.getProperty("links"));
+        Assert.assertTrue(((List)userProfile.getProperty("links")).contains("user"));
+
+        List<DominoEntity> entities = userProfile.links("user");
+        Assert.assertNotNull(entities);
+        Assert.assertFalse(entities.isEmpty());
+
+        for(DominoEntity entity : entities) {
+            System.out.println(entity.getEntityId());
+            System.out.println(entity.getProperty("entityType"));
+        }
+
+        System.out.println("Removing..." + adminUser.getEntityId());
+        userProfile.removeLink("user", adminUser.getEntityId());
+        userProfile.retrieve();
+//
+        Assert.assertNotNull(userProfile.getProperty("links"));
+        Assert.assertFalse(((List)userProfile.getProperty("links")).contains("user"));
+
+        userProfile.delete();
+    }
+
 
 }

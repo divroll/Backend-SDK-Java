@@ -190,9 +190,273 @@ public class DominoEntity extends DominoBase {
         return value;
     }
 
+    public List<DominoEntity> links(String linkName) {
+        List<DominoEntity> entities = new LinkedList<DominoEntity>();
+        if(entityId == null) {
+            throw new DominoException("Save the entity first before getting links");
+        }
+        try {
+            String completeUrl = Domino.getServerUrl() + entityStoreBase + "/" + getEntityId() + "/links/" + linkName;
+
+            GetRequest getRequest = (GetRequest) Unirest.get(completeUrl);
+
+            if(Domino.getMasterKey() != null) {
+                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            }
+            if(Domino.getAppId() != null) {
+                getRequest.header(HEADER_APP_ID, Domino.getAppId());
+            }
+            if(Domino.getApiKey() != null) {
+                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
+            }
+            if(Domino.getAuthToken() != null) {
+                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            }
+
+            HttpResponse<JsonNode> response = getRequest.asJson();
+            System.out.println(response.getBody().toString());
+
+            if(response.getStatus() >= 500) {
+                throwException(response);
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            }  else if(response.getStatus() >= 400) {
+                throwException(response);
+            } else if(response.getStatus() == 200) {
+
+                JsonNode body = response.getBody();
+                JSONObject bodyObj = body.getObject();
+                JSONObject entitiesJSONObject = bodyObj.getJSONObject("entities");
+                JSONArray results = entitiesJSONObject.getJSONArray("results");
+                for(int i=0;i<results.length();i++){
+                    DominoEntity dominoEntity = new DominoEntity();
+                    JSONObject entityJSONObject = results.getJSONObject(i);
+                    Iterator<String> it = entityJSONObject.keySet().iterator();
+                    while(it.hasNext()) {
+                        String propertyKey = it.next();
+                        if( propertyKey.equals("entityId")) {
+                            dominoEntity.setEntityId(entityJSONObject.getString(propertyKey));
+                        }
+                        else if (propertyKey.equals("publicRead")) {
+                            try {
+                                Boolean value = entityJSONObject.getBoolean("publicRead");
+                                dominoEntity.getAcl().setPublicRead(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else if(propertyKey.equals("publicWrite")) {
+                            try {
+                                Boolean value = entityJSONObject.getBoolean("publicWrite");
+                                dominoEntity.getAcl().setPublicWrite(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else if(propertyKey.equals("aclRead")) {
+                            try {
+                                List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclRead"));
+                                dominoEntity.getAcl().setAclRead(value);
+                            } catch (Exception e) {
+
+                            }
+                            try {
+                                List<String> value = Arrays.asList(entityJSONObject.getString("aclRead"));
+                                dominoEntity.getAcl().setAclRead(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else if(propertyKey.equals("aclWrite")) {
+                            try {
+                                List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclWrite"));
+                                dominoEntity.getAcl().setAclWrite(value);
+                            } catch (Exception e) {
+
+                            }
+                            try {
+                                List<String> value = Arrays.asList(entityJSONObject.getString("aclWrite"));
+                                dominoEntity.getAcl().setAclWrite(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else {
+                            dominoEntity.setProperty(propertyKey, entityJSONObject.get(propertyKey));
+                        }
+                    }
+                    entities.add(dominoEntity);
+                }
+
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return entities;
+    }
+
+
+    public List<DominoEntity> getEntities(String linkName) {
+        List<DominoEntity> entities = new LinkedList<DominoEntity>();
+        if(entityId == null) {
+            throw new DominoException("Save the entity first before getting links");
+        }
+        try {
+            DominoEntity dominoEntity = new DominoEntity();
+            String completeUrl = Domino.getServerUrl() + entityStoreBase + "/" + getEntityId() + "/links/" + linkName;
+            GetRequest getRequest = (GetRequest) Unirest.get(completeUrl);
+
+            if(Domino.getMasterKey() != null) {
+                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            }
+            if(Domino.getAppId() != null) {
+                getRequest.header(HEADER_APP_ID, Domino.getAppId());
+            }
+            if(Domino.getApiKey() != null) {
+                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
+            }
+            if(Domino.getAuthToken() != null) {
+                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            }
+
+            HttpResponse<JsonNode> response = getRequest.asJson();
+
+            if(response.getStatus() >= 500) {
+                throwException(response);
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
+            }  else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            }  else if(response.getStatus() >= 400) {
+                throwException(response);
+            } else if(response.getStatus() == 200) {
+                JsonNode body = response.getBody();
+                JSONObject bodyObj = body.getObject();
+                JSONObject entityJsonObject = bodyObj.getJSONObject("entities");
+                JSONObject resultJsonObject = entityJsonObject.getJSONObject("results");
+                String entityId = entityJsonObject.getString("entityId");
+
+                Boolean publicRead = null;
+                Boolean publicWrite = null;
+
+                try {
+                    publicWrite = entityJsonObject.getBoolean("publicWrite");
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    publicRead = entityJsonObject.getBoolean("publicRead");
+                } catch (Exception e) {
+
+                }
+
+                List<String> aclWriteList = null;
+                List<String> aclReadList = null;
+
+                try {
+                    aclWriteList = JSON.toList(entityJsonObject.getJSONArray("aclWrite"));
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    aclReadList = JSON.toList(entityJsonObject.getJSONArray("aclRead"));
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    aclWriteList = Arrays.asList(entityJsonObject.getString("aclWrite"));
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    aclReadList = Arrays.asList(entityJsonObject.getString("aclRead"));
+                } catch (Exception e) {
+
+                }
+
+                Iterator<String> it = entityJsonObject.keySet().iterator();
+                while(it.hasNext()) {
+                    String propertyKey = it.next();
+                    if( propertyKey.equals("entityId")) {
+                        setEntityId(entityJsonObject.getString(propertyKey));
+                    } else if (propertyKey.equals("publicRead")
+                            || propertyKey.equals("publicWrite")
+                            || propertyKey.equals("aclRead")
+                            || propertyKey.equals("aclWrite")) {
+                        // skip
+                    } else {
+                        Object obj = entityJsonObject.get(propertyKey);
+                        dominoEntity.setProperty(propertyKey, obj);
+                    }
+                }
+
+                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                acl.setPublicWrite(publicWrite);
+                acl.setPublicRead(publicRead);
+                dominoEntity.setEntityId(entityId);
+                dominoEntity.setAcl(acl);
+
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return entities;
+    }
+
     public void addLink(String linkName, String entityId) {
         if(entityId == null) {
             throw new DominoException("Save the entity first before creating a link");
+        }
+        try {
+            HttpRequestWithBody httpRequestWithBody = Unirest.post(Domino.getServerUrl()
+                    + entityStoreBase + "/" + getEntityId() + "/links/" + linkName + "/" + entityId);
+            if(Domino.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            }
+            if(Domino.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            }
+            if(Domino.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            }
+            if(Domino.getAuthToken() != null) {
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            }
+
+            JSONArray aclRead = new JSONArray();
+            JSONArray aclWrite = new JSONArray();
+            if(acl != null) {
+                for(String uuid : acl.getAclRead()) {
+                    aclRead.put(uuid);
+                }
+                for(String uuid : acl.getAclWrite()) {
+                    aclWrite.put(uuid);
+                }
+            }
+
+            httpRequestWithBody.header("X-Domino-ACL-Read", aclRead.toString());
+            httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
+            httpRequestWithBody.header("Content-Type", "application/json");
+
+            HttpResponse<JsonNode> response =  httpRequestWithBody.asJson();
+            if(response.getStatus() >= 500) {
+                throw new DominoException(response.getStatusText()); // TODO
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throw new DominoException("Client error"); // TODO
+            } else if(response.getStatus() == 201) {
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
         }
     }
 
@@ -200,11 +464,105 @@ public class DominoEntity extends DominoBase {
         if(entityId == null) {
             throw new DominoException("Save the entity first before removing a link");
         }
+        try {
+            HttpRequestWithBody httpRequestWithBody = Unirest.delete(Domino.getServerUrl()
+                    + entityStoreBase + "/" + getEntityId() + "/links/" + linkName + "/" + entityId);
+            if(Domino.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            }
+            if(Domino.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            }
+            if(Domino.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            }
+            if(Domino.getAuthToken() != null) {
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            }
+
+            JSONArray aclRead = new JSONArray();
+            JSONArray aclWrite = new JSONArray();
+            if(acl != null) {
+                for(String uuid : acl.getAclRead()) {
+                    aclRead.put(uuid);
+                }
+                for(String uuid : acl.getAclWrite()) {
+                    aclWrite.put(uuid);
+                }
+            }
+
+            httpRequestWithBody.header("X-Domino-ACL-Read", aclRead.toString());
+            httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
+            httpRequestWithBody.header("Content-Type", "application/json");
+
+            HttpResponse<JsonNode> response =  httpRequestWithBody.asJson();
+            if(response.getStatus() >= 500) {
+                throw new DominoException(response.getStatusText()); // TODO
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throw new DominoException("Client error"); // TODO
+            } else if(response.getStatus() == 201) {
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
     }
 
     public void removeLinks(String linkName) {
         if(entityId == null) {
             throw new DominoException("Save the entity first before removing links");
+        }
+        try {
+            HttpRequestWithBody httpRequestWithBody = Unirest.delete(Domino.getServerUrl()
+                    + entityStoreBase + "/" + getEntityId() + "/links/" + linkName);
+            if(Domino.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            }
+            if(Domino.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            }
+            if(Domino.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            }
+            if(Domino.getAuthToken() != null) {
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            }
+
+            JSONArray aclRead = new JSONArray();
+            JSONArray aclWrite = new JSONArray();
+            if(acl != null) {
+                for(String uuid : acl.getAclRead()) {
+                    aclRead.put(uuid);
+                }
+                for(String uuid : acl.getAclWrite()) {
+                    aclWrite.put(uuid);
+                }
+            }
+
+            httpRequestWithBody.header("X-Domino-ACL-Read", aclRead.toString());
+            httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
+            httpRequestWithBody.header("Content-Type", "application/json");
+
+            HttpResponse<JsonNode> response =  httpRequestWithBody.asJson();
+            if(response.getStatus() >= 500) {
+                throw new DominoException(response.getStatusText()); // TODO
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
+            } else if(response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            } else if(response.getStatus() >= 400) {
+                throw new DominoException("Client error"); // TODO
+            } else if(response.getStatus() == 201) {
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
         }
     }
 
