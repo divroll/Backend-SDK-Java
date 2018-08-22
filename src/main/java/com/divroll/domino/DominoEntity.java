@@ -17,9 +17,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class DominoEntity extends DominoBase {
 
@@ -179,7 +177,17 @@ public class DominoEntity extends DominoBase {
     }
 
     public Object getProperty(String propertyName) {
-        return entityObj.get(propertyName);
+        Object value = entityObj.get(propertyName);
+        if(value instanceof JSONObject) {
+            JSONObject jsonObject = (JSONObject) value;
+            Map<String,Object> entityMap = JSON.toMap(jsonObject);
+            return entityMap;
+        } else if(value instanceof  JSONArray) {
+            JSONArray jsonArray = (JSONArray) value;
+            List<Object> list = JSON.toArray(jsonArray);
+            return list;
+        }
+        return value;
     }
 
     public void addLink(String linkName, String entityId) {}
@@ -420,72 +428,14 @@ public class DominoEntity extends DominoBase {
                     String propertyKey = it.next();
                     if( propertyKey.equals("entityId")) {
                         setEntityId(entityJsonObject.getString(propertyKey));
-                    }/* else if(propertyKey.equals("publicRead")) {
-                        Boolean value = entityJsonObject.getBoolean(propertyKey);
-                        getAcl().setPublicRead(value);
-                    } else if(propertyKey.equals("publicWrite")) {
-                        Boolean value = entityJsonObject.getBoolean(propertyKey);
-                        getAcl().setPublicWrite(value);
-                    }  else if(propertyKey.equals("aclRead")) {
-                        try {
-                            String value = entityJsonObject.getString(propertyKey);
-                            getAcl().getAclRead().add(value);
-                        } catch (Exception e) {
-                            // do nothing
-                        }
-                        try {
-                            JSONArray array = entityJsonObject.getJSONArray(propertyKey);
-                            for(int i=0;i<array.length();i++) {
-                                try {
-                                    String stringValue = array.getString(i);
-                                    getAcl().getAclRead().add(stringValue);
-                                } catch (Exception e) {
-                                }
-                                try {
-                                    JSONObject jsonObjectValue = array.getJSONObject(i);
-                                    String entityIdValue = jsonObjectValue.getString("entityId");
-                                    getAcl().getAclRead().add(entityIdValue);
-                                } catch (Exception e) {
-                                    // do nothing
-                                }
-                            }
-                        } catch (Exception e) {
-                            // do nothing
-                        }
-                    }  else if(propertyKey.equals("aclWrite")) {
-                        try {
-                            String value = entityJsonObject.getString(propertyKey);
-                            getAcl().getAclRead().add(value);
-                        } catch (Exception e) {
-                            // do nothing
-                        }
-                        try {
-                            JSONArray array = entityJsonObject.getJSONArray(propertyKey);
-                            for(int i=0;i<array.length();i++) {
-                                try {
-                                    String stringValue = array.getString(i);
-                                    getAcl().getAclWrite().add(stringValue);
-                                } catch (Exception e) {
-                                }
-                                try {
-                                    JSONObject jsonObjectValue = array.getJSONObject(i);
-                                    String entityIdValue = jsonObjectValue.getString("entityId");
-                                    getAcl().getAclWrite().add(entityIdValue);
-                                } catch (Exception e) {
-                                    // do nothing
-                                }
-                            }
-                        } catch (Exception e) {
-                            // do nothing
-                        }
-                    }*/
-                    else if (propertyKey.equals("publicRead")
+                    } else if (propertyKey.equals("publicRead")
                             || propertyKey.equals("publicWrite")
                             || propertyKey.equals("aclRead")
                             || propertyKey.equals("aclWrite")) {
                         // skip
                     } else {
-                        entityObj.put(propertyKey, entityJsonObject.get(propertyKey));
+                        Object obj = entityJsonObject.get(propertyKey);
+                        entityObj.put(propertyKey, obj);
                     }
                 }
 

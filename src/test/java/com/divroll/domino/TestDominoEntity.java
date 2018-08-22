@@ -4,6 +4,7 @@ import com.divroll.domino.exception.BadRequestException;
 import com.divroll.domino.exception.NotFoundRequestException;
 import com.divroll.domino.exception.UnauthorizedException;
 import junit.framework.TestCase;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.util.*;
 
 @RunWith(JUnit4.class)
 public class TestDominoEntity extends TestCase {
@@ -32,6 +33,62 @@ public class TestDominoEntity extends TestCase {
         entity.create();
 
         Assert.assertNotNull(entity.getEntityId());
+    }
+
+    @Test
+    public void testCreateEntityWithMapUsingMasterKey() {
+        TestApplication application = TestData.getNewApplication();
+        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+
+        DominoEntity entity = new DominoEntity("TestEntity");
+        entity.setProperty("username", "TestUser");
+        entity.setProperty("age", 30);
+        entity.setProperty("nickname", "testo");
+
+        Map<String,Object> map = new LinkedHashMap<String,Object>();
+        map.put("test1", "Test Data");
+        map.put("test2", 123);
+        map.put("test3", false);
+
+        entity.setProperty("embed", map);
+
+        List<Object> list = new LinkedList<Object>();
+        list.add("Hello");
+        list.add("World");
+        list.add(456);
+        list.add(true);
+
+        entity.setProperty("list", list);
+
+        entity.create();
+
+        String entityId = entity.getEntityId();
+
+        Assert.assertNotNull(entityId);
+
+        DominoEntity entity1 = new DominoEntity("TestEntity");
+        entity1.setEntityId(entityId);
+
+        entity1.retrieve();
+
+        Assert.assertNotNull(entity1.getEntityId());
+        Assert.assertNotNull(entity1.getProperty("embed"));
+
+        Assert.assertEquals("Test Data", ((Map<String,Object>) (entity1.getProperty("embed"))).get("test1"));
+        Assert.assertEquals(123, ((Double)((Map<String,Object>) (entity1.getProperty("embed"))).get("test2")).longValue());
+        Assert.assertEquals(false, ((Map<String,Object>) (entity1.getProperty("embed"))).get("test3"));
+
+        Assert.assertNotNull(entity1.getProperty("list"));
+        Assert.assertEquals("Hello", ((List)entity1.getProperty("list")).get(0));
+        Assert.assertEquals("World", ((List)entity1.getProperty("list")).get(1));
+        Assert.assertEquals(456, ((Double) ((List)entity1.getProperty("list")).get(2)).longValue());
+        Assert.assertEquals(true, ((List)entity1.getProperty("list")).get(3));
+
+        Assert.assertEquals("TestUser", entity1.getProperty("username"));
+        Assert.assertEquals(30, entity1.getProperty("age"));
+        Assert.assertEquals("testo", entity1.getProperty("nickname"));
+
+
     }
 
     @Test

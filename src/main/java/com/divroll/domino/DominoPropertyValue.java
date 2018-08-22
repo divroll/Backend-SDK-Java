@@ -2,6 +2,9 @@ package com.divroll.domino;
 
 import com.divroll.domino.exception.UnsupportedPropertyValueException;
 
+import java.util.List;
+import java.util.Map;
+
 public class DominoPropertyValue {
     private Object value = null;
     public DominoPropertyValue(Object value) {
@@ -13,7 +16,9 @@ public class DominoPropertyValue {
                 || !value.getClass().getName().equalsIgnoreCase(Long.class.getName())
                 || !value.getClass().getName().equalsIgnoreCase(Short.class.getName())
                 || !value.getClass().getName().equalsIgnoreCase(Float.class.getName())
-                || !value.getClass().getName().equalsIgnoreCase(Double.class.getName())) {
+                || !value.getClass().getName().equalsIgnoreCase(Double.class.getName())
+                || !value.getClass().getName().equalsIgnoreCase(Map.class.getName())
+                || !value.getClass().getName().equalsIgnoreCase(List.class.getName())) {
             //throw new UnsupportedPropertyValueException(value.getClass().getName());
         }
         this.value = value;
