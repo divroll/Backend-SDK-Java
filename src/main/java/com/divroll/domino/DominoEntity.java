@@ -190,11 +190,23 @@ public class DominoEntity extends DominoBase {
         return value;
     }
 
-    public void addLink(String linkName, String entityId) {}
+    public void addLink(String linkName, String entityId) {
+        if(entityId == null) {
+            throw new DominoException("Save the entity first before creating a link");
+        }
+    }
 
-    public void removeLink(String linkName, String entityId) {}
+    public void removeLink(String linkName, String entityId) {
+        if(entityId == null) {
+            throw new DominoException("Save the entity first before removing a link");
+        }
+    }
 
-    public void removeLinks(String linkName) {}
+    public void removeLinks(String linkName) {
+        if(entityId == null) {
+            throw new DominoException("Save the entity first before removing links");
+        }
+    }
 
     public DominoACL getAcl() {
         return acl;
