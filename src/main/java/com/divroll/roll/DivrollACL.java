@@ -1,19 +1,18 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DominoACL {
+public class DivrollACL {
 
     private List<String> aclRead;
     private List<String> aclWrite;
     private Boolean publicRead;
     private Boolean publicWrite;
 
-    public DominoACL() {}
+    public DivrollACL() {}
 
-    public DominoACL(List<String> aclRead, List<String> aclWrite) {
+    public DivrollACL(List<String> aclRead, List<String> aclWrite) {
         setAclRead(aclRead);
         setAclWrite(aclWrite);
     }
@@ -40,34 +39,34 @@ public class DominoACL {
         this.aclWrite = aclWrite;
     }
 
-    public static DominoACL build() {
-        DominoACL dominoACL = new DominoACL();
-        return dominoACL;
+    public static DivrollACL build() {
+        DivrollACL divrollACL = new DivrollACL();
+        return divrollACL;
     }
 
-    public static DominoACL buildPublicReadWrite() {
-        DominoACL dominoALC = new DominoACL();
-        dominoALC.setPublicWrite(true);
-        dominoALC.setPublicRead(true);
-        return dominoALC;
+    public static DivrollACL buildPublicReadWrite() {
+        DivrollACL divrollALC = new DivrollACL();
+        divrollALC.setPublicWrite(true);
+        divrollALC.setPublicRead(true);
+        return divrollALC;
     }
 
-    public static DominoACL buildMasterKeyOnly() {
-        DominoACL dominoALC = new DominoACL();
-        dominoALC.setPublicWrite(false);
-        dominoALC.setPublicRead(false);
-        dominoALC.setAclRead(null);
-        dominoALC.setAclWrite(null);
-        return dominoALC;
+    public static DivrollACL buildMasterKeyOnly() {
+        DivrollACL divrollALC = new DivrollACL();
+        divrollALC.setPublicWrite(false);
+        divrollALC.setPublicRead(false);
+        divrollALC.setAclRead(null);
+        divrollALC.setAclWrite(null);
+        return divrollALC;
     }
 
-    public static DominoACL buildPublicReadMasterKeyWrite() {
-        DominoACL dominoALC = new DominoACL();
-        dominoALC.setPublicWrite(false);
-        dominoALC.setPublicRead(true);
-        dominoALC.setAclRead(null);
-        dominoALC.setAclWrite(null);
-        return dominoALC;
+    public static DivrollACL buildPublicReadMasterKeyWrite() {
+        DivrollACL divrollALC = new DivrollACL();
+        divrollALC.setPublicWrite(false);
+        divrollALC.setPublicRead(true);
+        divrollALC.setAclRead(null);
+        divrollALC.setAclWrite(null);
+        return divrollALC;
     }
 
     public Boolean getPublicRead() {

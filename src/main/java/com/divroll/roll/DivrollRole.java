@@ -1,9 +1,9 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
-import com.divroll.domino.exception.BadRequestException;
-import com.divroll.domino.exception.DominoException;
-import com.divroll.domino.exception.UnauthorizedException;
-import com.divroll.domino.helper.JSON;
+import com.divroll.roll.exception.BadRequestException;
+import com.divroll.roll.exception.DivrollException;
+import com.divroll.roll.exception.UnauthorizedException;
+import com.divroll.roll.helper.JSON;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -16,31 +16,31 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.List;
 
-public class DominoRole extends DominoBase {
+public class DivrollRole extends DivrollBase {
 
     private static final String rolesUrl = "/entities/roles";
 
     private String entityId;
     private String name;
-    private DominoACL acl;
+    private DivrollACL acl;
 
-    public DominoRole() {}
+    public DivrollRole() {}
 
-    public DominoRole(String name) {
+    public DivrollRole(String name) {
         setName(name);
     }
 
     public void create() {
         try {
-            HttpRequestWithBody httpRequestWithBody = Unirest.post(Domino.getServerUrl() + rolesUrl);
-            if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            HttpRequestWithBody httpRequestWithBody = Unirest.post(Divroll.getServerUrl() + rolesUrl);
+            if(Divroll.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
             }
 
             JSONObject roleObj = new JSONObject();
@@ -64,23 +64,23 @@ public class DominoRole extends DominoBase {
                     aclWrite.put(uuid);
                 }
             }
-            httpRequestWithBody.header("X-Domino-ACL-Read", aclRead.toString());
-            httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
             System.out.println("REQUEST: " + body.toString());
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
             if(response.getStatus() >= 500) {
-                throw new DominoException(response.getStatusText());
+                throw new DivrollException(response.getStatusText());
             } else if(response.getStatus() == 400) {
                 throw new BadRequestException(response.getStatusText());
             } else if(response.getStatus() == 404) {
-                throw new DominoException(response.getStatusText());
+                throw new DivrollException(response.getStatusText());
             } else if(response.getStatus() == 401) {
                 throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() == 401) {
-                throw new DominoException(response.getStatusText());
+                throw new DivrollException(response.getStatusText());
             } else if(response.getStatus() == 201) {
                 JsonNode responseBody = response.getBody();
                 JSONObject bodyObj = responseBody.getObject();
@@ -132,7 +132,7 @@ public class DominoRole extends DominoBase {
 
                 }
 
-                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
                 acl.setPublicRead(publicRead);
                 acl.setPublicWrite(publicWrite);
                 setEntityId(entityId);
@@ -145,15 +145,15 @@ public class DominoRole extends DominoBase {
     }
     public void update() {
         try {
-            HttpRequestWithBody httpRequestWithBody = Unirest.put(Domino.getServerUrl() + rolesUrl + "/" + getEntityId());
-            if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            HttpRequestWithBody httpRequestWithBody = Unirest.put(Divroll.getServerUrl() + rolesUrl + "/" + getEntityId());
+            if(Divroll.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
             }
 
             JSONObject roleObj = new JSONObject();
@@ -176,21 +176,21 @@ public class DominoRole extends DominoBase {
                     aclWrite.put(uuid);
                 }
             }
-            httpRequestWithBody.header("X-Domino-ACL-Read", aclRead.toString());
-            httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
             System.out.println("REQUEST: " + body.toString());
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
             if(response.getStatus() >= 500) {
-                throw new DominoException(response.getStatusText());
+                throw new DivrollException(response.getStatusText());
             } else if(response.getStatus() == 400) {
                 throw new BadRequestException(response.getStatusText());
             } else if(response.getStatus() == 401) {
                 throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() == 404) {
-                throw new DominoException(response.getStatusText());
+                throw new DivrollException(response.getStatusText());
             } else if(response.getStatus() >= 400) {
                 throwException(response);
             } else if(response.getStatus() == 201) {
@@ -229,7 +229,7 @@ public class DominoRole extends DominoBase {
 
                 }
 
-                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
                 acl.setPublicRead(publicRead);
                 acl.setPublicWrite(publicWrite);
                 setEntityId(entityId);
@@ -243,19 +243,19 @@ public class DominoRole extends DominoBase {
 
     public boolean delete() {
         try {
-            HttpRequestWithBody httpRequestWithBody = Unirest.delete(Domino.getServerUrl()
+            HttpRequestWithBody httpRequestWithBody = Unirest.delete(Divroll.getServerUrl()
                     + rolesUrl + "/" + getEntityId());
-            if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            if(Divroll.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
             }
-            if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getApiKey());
+            if(Divroll.getAuthToken() != null) {
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getApiKey());
             }
             HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
             if(response.getStatus() >= 500) {
@@ -276,22 +276,22 @@ public class DominoRole extends DominoBase {
         return false;
     }
 
-    public void retrieve() throws DominoException {
+    public void retrieve() throws DivrollException {
         try {
-            GetRequest getRequest = (GetRequest) Unirest.get(Domino.getServerUrl()
+            GetRequest getRequest = (GetRequest) Unirest.get(Divroll.getServerUrl()
                     + rolesUrl + "/" + getEntityId());
 
-            if(Domino.getMasterKey() != null) {
-                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            if(Divroll.getMasterKey() != null) {
+                getRequest.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                getRequest.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                getRequest.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
             }
-            if(Domino.getAuthToken() != null) {
-                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            if(Divroll.getAuthToken() != null) {
+                getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
@@ -342,7 +342,7 @@ public class DominoRole extends DominoBase {
 
                 }
 
-                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
                 acl.setPublicWrite(publicWrite);
                 acl.setPublicRead(publicRead);
                 setEntityId(entityId);
@@ -371,11 +371,11 @@ public class DominoRole extends DominoBase {
         this.name = name;
     }
 
-    public DominoACL getAcl() {
+    public DivrollACL getAcl() {
         return acl;
     }
 
-    public void setAcl(DominoACL acl) {
+    public void setAcl(DivrollACL acl) {
         this.acl = acl;
     }
 

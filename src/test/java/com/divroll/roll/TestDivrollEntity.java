@@ -1,10 +1,8 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
-import com.divroll.domino.exception.BadRequestException;
-import com.divroll.domino.exception.NotFoundRequestException;
-import com.divroll.domino.exception.UnauthorizedException;
+import com.divroll.roll.exception.NotFoundRequestException;
+import com.divroll.roll.exception.UnauthorizedException;
 import junit.framework.TestCase;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @RunWith(JUnit4.class)
-public class TestDominoEntity extends TestCase {
+public class TestDivrollEntity extends TestCase {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -24,9 +22,9 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreateEntityUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoEntity entity = new DominoEntity("TestEntity");
+        DivrollEntity entity = new DivrollEntity("TestEntity");
         entity.setProperty("username", "TestUser");
         entity.setProperty("age", 30);
         entity.setProperty("nickname", "testo");
@@ -38,9 +36,9 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreateEntityWithMapUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoEntity entity = new DominoEntity("TestEntity");
+        DivrollEntity entity = new DivrollEntity("TestEntity");
         entity.setProperty("username", "TestUser");
         entity.setProperty("age", 30);
         entity.setProperty("nickname", "testo");
@@ -66,7 +64,7 @@ public class TestDominoEntity extends TestCase {
 
         Assert.assertNotNull(entityId);
 
-        DominoEntity entity1 = new DominoEntity("TestEntity");
+        DivrollEntity entity1 = new DivrollEntity("TestEntity");
         entity1.setEntityId(entityId);
 
         entity1.retrieve();
@@ -94,13 +92,13 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreatePublicEntityThenUpdate() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoEntity entity = new DominoEntity("TestEntity");
+        DivrollEntity entity = new DivrollEntity("TestEntity");
         entity.setProperty("username", "TestUser");
         entity.setProperty("age", 30);
         entity.setProperty("nickname", "testo");
-        entity.setAcl(DominoACL.buildPublicReadWrite());
+        entity.setAcl(DivrollACL.buildPublicReadWrite());
         entity.create();
 
         Assert.assertNotNull(entity.getEntityId());
@@ -114,9 +112,9 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreateEntityInvalidACL() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        DominoACL acl = DominoACL.build();
+        Divroll.initialize(application.getAppId(), application.getApiToken());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        DivrollACL acl = DivrollACL.build();
         acl.setAclWrite(Arrays.asList("")); // invalid
         acl.setAclRead(Arrays.asList(""));  // invalid
         userProfile.setAcl(acl);
@@ -127,9 +125,9 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreateEntityMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setAcl(null);
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
@@ -145,9 +143,9 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testCreateEntityMasterKeyOnlyShouldThrowException() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setAcl(null);
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
@@ -167,10 +165,10 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreateEntityMasterKeyOnly() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildMasterKeyOnly());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -191,9 +189,9 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testCreateEntityInvalidAppId() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize("WRONG", application.getApiToken());
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildMasterKeyOnly());
+        Divroll.initialize("WRONG", application.getApiToken());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildMasterKeyOnly());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -202,9 +200,9 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testCreateEntityInvalidApiToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), "WRONG");
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildMasterKeyOnly());
+        Divroll.initialize(application.getAppId(), "WRONG");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildMasterKeyOnly());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -218,10 +216,10 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testGetEntityInvalidAppId() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildMasterKeyOnly());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -231,7 +229,7 @@ public class TestDominoEntity extends TestCase {
         Assert.assertTrue(userProfile.getAcl().getAclRead().isEmpty());
         Assert.assertTrue(userProfile.getAcl().getAclWrite().isEmpty());
 
-        Domino.initialize("WRONG", application.getApiToken());
+        Divroll.initialize("WRONG", application.getApiToken());
         userProfile.retrieve();
         Assert.assertNull(userProfile.getEntityId());
         Assert.assertNull(userProfile.getAcl());
@@ -240,10 +238,10 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testGetUserInvalidApiToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildMasterKeyOnly());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -253,7 +251,7 @@ public class TestDominoEntity extends TestCase {
         Assert.assertTrue(userProfile.getAcl().getAclRead().isEmpty());
         Assert.assertTrue(userProfile.getAcl().getAclWrite().isEmpty());
 
-        Domino.initialize(application.getAppId(), "WRONG");
+        Divroll.initialize(application.getAppId(), "WRONG");
         userProfile.retrieve();
         Assert.assertNull(userProfile.getEntityId());
         Assert.assertNull(userProfile.getAcl());
@@ -267,21 +265,21 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreateAndGetEntityWithACLUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser adminUser = new DominoUser();
+        DivrollUser adminUser = new DivrollUser();
         adminUser.create("admin", "password");
 
         Assert.assertNotNull(adminUser.getEntityId());
 
         String userId = adminUser.getEntityId();
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
 
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setPublicRead(true);
-        dominoACL.setAclWrite(Arrays.asList(userId));
-        userProfile.setAcl(dominoACL);
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setPublicRead(true);
+        divrollACL.setAclWrite(Arrays.asList(userId));
+        userProfile.setAcl(divrollACL);
 
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
@@ -293,7 +291,7 @@ public class TestDominoEntity extends TestCase {
 
         adminUser.login("admin", "password");
         Assert.assertNotNull(adminUser.getAuthToken());
-        Assert.assertNotNull(Domino.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
         userProfile.retrieve();
 
@@ -305,16 +303,16 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testCreateAndGetEntityWithACLMissingAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser dominoAdmin = new DominoUser();
-        dominoAdmin.setAcl(DominoACL.buildMasterKeyOnly());
-        dominoAdmin.create("admin", "password");
+        DivrollUser divrollAdmin = new DivrollUser();
+        divrollAdmin.setAcl(DivrollACL.buildMasterKeyOnly());
+        divrollAdmin.create("admin", "password");
 
-        String adminUserId = dominoAdmin.getEntityId();
+        String adminUserId = divrollAdmin.getEntityId();
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        DominoACL acl = new DominoACL();
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        DivrollACL acl = new DivrollACL();
         acl.setAclWrite(Arrays.asList(adminUserId));
         acl.setAclRead(Arrays.asList(adminUserId));
         userProfile.setAcl(acl);
@@ -333,10 +331,10 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdatePublicEntityMissingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -357,21 +355,21 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testUpdateEntityWithACLMissingAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser dominoUser = new DominoUser();
-        dominoUser.create("admin", "password");
+        DivrollUser divrollUser = new DivrollUser();
+        divrollUser.create("admin", "password");
 
-        Assert.assertNotNull(dominoUser.getEntityId());
+        Assert.assertNotNull(divrollUser.getEntityId());
 
-        String userId = dominoUser.getEntityId();
+        String userId = divrollUser.getEntityId();
 
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setAclRead(Arrays.asList(userId));
-        dominoACL.setAclWrite(Arrays.asList(userId));
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setAclRead(Arrays.asList(userId));
+        divrollACL.setAclWrite(Arrays.asList(userId));
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(dominoACL);
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(divrollACL);
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -387,21 +385,21 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdateEntityWithACL() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser dominoUser = new DominoUser();
-        dominoUser.create("admin", "password");
+        DivrollUser divrollUser = new DivrollUser();
+        divrollUser.create("admin", "password");
 
-        Assert.assertNotNull(dominoUser.getEntityId());
+        Assert.assertNotNull(divrollUser.getEntityId());
 
-        String userId = dominoUser.getEntityId();
+        String userId = divrollUser.getEntityId();
 
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setAclRead(Arrays.asList(userId));
-        dominoACL.setAclWrite(Arrays.asList(userId));
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setAclRead(Arrays.asList(userId));
+        divrollACL.setAclWrite(Arrays.asList(userId));
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(dominoACL);
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(divrollACL);
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -410,7 +408,7 @@ public class TestDominoEntity extends TestCase {
         Assert.assertTrue(userProfile.getAcl().getAclWrite().contains("0-0"));
         Assert.assertTrue(userProfile.getAcl().getAclRead().contains("0-0"));
 
-        dominoUser.login("admin", "password");
+        divrollUser.login("admin", "password");
 
         userProfile.setProperty("age", 40);
         userProfile.update();
@@ -419,21 +417,21 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdateEntityWithACLUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoUser dominoUser = new DominoUser();
-        dominoUser.create("admin", "password");
+        DivrollUser divrollUser = new DivrollUser();
+        divrollUser.create("admin", "password");
 
-        Assert.assertNotNull(dominoUser.getEntityId());
+        Assert.assertNotNull(divrollUser.getEntityId());
 
-        String userId = dominoUser.getEntityId();
+        String userId = divrollUser.getEntityId();
 
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setAclRead(Arrays.asList(userId));
-        dominoACL.setAclWrite(Arrays.asList(userId));
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setAclRead(Arrays.asList(userId));
+        divrollACL.setAclWrite(Arrays.asList(userId));
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(dominoACL);
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(divrollACL);
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -449,15 +447,15 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdatePublicEntityUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser admin = new DominoUser();
+        DivrollUser admin = new DivrollUser();
         admin.create("admin", "password");
 
         Assert.assertNotNull(admin.getEntityId());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -480,15 +478,15 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdatePublicUserUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser admin = new DominoUser();
+        DivrollUser admin = new DivrollUser();
         admin.create("admin", "password");
 
         Assert.assertNotNull(admin.getEntityId());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -509,10 +507,10 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdatePublicEntityChangeACLUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -521,7 +519,7 @@ public class TestDominoEntity extends TestCase {
         Assert.assertTrue(userProfile.getAcl().getPublicRead());
         Assert.assertTrue(userProfile.getAcl().getPublicWrite());
 
-        userProfile.setAcl(DominoACL.buildMasterKeyOnly());
+        userProfile.setAcl(DivrollACL.buildMasterKeyOnly());
         userProfile.update();
 
         Assert.assertEquals("Johnny", userProfile.getProperty("nickname"));
@@ -533,15 +531,15 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdatePublicEntityChangeACLUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser admin = new DominoUser();
+        DivrollUser admin = new DivrollUser();
         admin.create("admin", "password");
 
         Assert.assertNotNull(admin.getEntityId());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
         userProfile.create();
@@ -550,10 +548,10 @@ public class TestDominoEntity extends TestCase {
         Assert.assertTrue(userProfile.getAcl().getPublicRead());
         Assert.assertTrue(userProfile.getAcl().getPublicWrite());
 
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setAclRead(Arrays.asList(admin.getEntityId()));
-        dominoACL.setAclWrite(Arrays.asList(admin.getEntityId()));
-        userProfile.setAcl(dominoACL);
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setAclRead(Arrays.asList(admin.getEntityId()));
+        divrollACL.setAclWrite(Arrays.asList(admin.getEntityId()));
+        userProfile.setAcl(divrollACL);
 
         admin.login("admin", "password");
 
@@ -570,26 +568,26 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testUpdateEntityUsingAuthTokenWithRole() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
         String adminRoleId = role.getEntityId();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.create("admin", "password");
 
-        DominoUser dominoUser = new DominoUser();
-        DominoACL userACL = new DominoACL();
+        DivrollUser divrollUser = new DivrollUser();
+        DivrollACL userACL = new DivrollACL();
         userACL.setPublicRead(true);
         userACL.setPublicWrite(false);
         userACL.setAclWrite(Arrays.asList(adminRoleId));
-        dominoUser.setAcl(userACL);
-        dominoUser.create("user", "password");
+        divrollUser.setAcl(userACL);
+        divrollUser.create("user", "password");
 
         Assert.assertNotNull(adminUser.getRoles());
         Assert.assertFalse(adminUser.getRoles().isEmpty());
@@ -598,21 +596,21 @@ public class TestDominoEntity extends TestCase {
         String authToken = adminUser.getAuthToken();
 
         Assert.assertNotNull(authToken);
-        Assert.assertNotNull(Domino.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
         System.out.println("Updating...");
 
-        dominoUser.update("new_username", "new_password");
-        Assert.assertEquals("new_username", dominoUser.getUsername());
+        divrollUser.update("new_username", "new_password");
+        Assert.assertEquals("new_username", divrollUser.getUsername());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
 
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setAclRead(Arrays.asList(adminUser.getEntityId()));
-        dominoACL.setAclWrite(Arrays.asList(adminUser.getEntityId()));
-        userProfile.setAcl(dominoACL);
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setAclRead(Arrays.asList(adminUser.getEntityId()));
+        divrollACL.setAclWrite(Arrays.asList(adminUser.getEntityId()));
+        userProfile.setAcl(divrollACL);
 
         userProfile.create();
 
@@ -623,12 +621,12 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = NotFoundRequestException.class)
     public void testDeletePublicEntity() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
 
         userProfile.create();
 
@@ -642,19 +640,19 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = NotFoundRequestException.class)
     public void testDeletePublicEntityWithAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.create("admin", "password");
 
         adminUser.login("admin", "password");
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
         userProfile.create();
 
         Assert.assertNotNull(userProfile.getEntityId());
@@ -671,12 +669,12 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testDeletePublicEntityWithMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
-        userProfile.setAcl(DominoACL.buildPublicReadWrite());
+        userProfile.setAcl(DivrollACL.buildPublicReadWrite());
         userProfile.create();
 
         Assert.assertNotNull(userProfile.getEntityId());
@@ -686,21 +684,21 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testDeleteEntityWithACLWithAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole adminRole = new DominoRole("Admin");
-        adminRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole adminRole = new DivrollRole("Admin");
+        adminRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         adminRole.create();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(adminRole);
         adminUser.create("admin", "password");
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
-        DominoACL acl = new DominoACL();
+        DivrollACL acl = new DivrollACL();
         acl.setAclWrite(Arrays.asList(adminRole.getEntityId()));
         userProfile.setAcl(acl);
 
@@ -711,7 +709,7 @@ public class TestDominoEntity extends TestCase {
 
         adminUser.login("admin", "password");
         Assert.assertNotNull(adminUser.getAuthToken());
-        Assert.assertNotNull(Domino.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
         userProfile.delete();
     }
@@ -719,21 +717,21 @@ public class TestDominoEntity extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testDeleteEntityWithACLWithoutAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole adminRole = new DominoRole("Admin");
-        adminRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole adminRole = new DivrollRole("Admin");
+        adminRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         adminRole.create();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(adminRole);
         adminUser.create("admin", "password");
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
-        DominoACL acl = new DominoACL();
+        DivrollACL acl = new DivrollACL();
         acl.setAclWrite(Arrays.asList(adminRole.getEntityId()));
         userProfile.setAcl(acl);
 
@@ -744,7 +742,7 @@ public class TestDominoEntity extends TestCase {
 
         //adminUser.login("admin", "password");
 //        Assert.assertNotNull(adminUser.getAuthToken());
-//        Assert.assertNotNull(Domino.getAuthToken());
+//        Assert.assertNotNull(Divroll.getAuthToken());
 
         userProfile.delete();
     }
@@ -752,21 +750,21 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testSetEntityBlob() throws UnsupportedEncodingException {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole adminRole = new DominoRole("Admin");
-        adminRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole adminRole = new DivrollRole("Admin");
+        adminRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         adminRole.create();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(adminRole);
         adminUser.create("admin", "password");
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
-        DominoACL acl = new DominoACL();
+        DivrollACL acl = new DivrollACL();
         acl.setAclWrite(Arrays.asList(adminRole.getEntityId()));
         userProfile.setAcl(acl);
 
@@ -777,7 +775,7 @@ public class TestDominoEntity extends TestCase {
 
         adminUser.login("admin", "password");
         Assert.assertNotNull(adminUser.getAuthToken());
-        Assert.assertNotNull(Domino.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
         try {
             userProfile.setBlobProperty("picture", "this is a picture".getBytes("utf-8"));
@@ -798,21 +796,21 @@ public class TestDominoEntity extends TestCase {
     @Test
     public void testCreateLink() throws UnsupportedEncodingException {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole adminRole = new DominoRole("Admin");
-        adminRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole adminRole = new DivrollRole("Admin");
+        adminRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         adminRole.create();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(adminRole);
         adminUser.create("admin", "password");
 
-        DominoEntity userProfile = new DominoEntity("UserProfile");
+        DivrollEntity userProfile = new DivrollEntity("UserProfile");
         userProfile.setProperty("nickname", "Johnny");
         userProfile.setProperty("age", 30);
-        DominoACL acl = new DominoACL();
+        DivrollACL acl = new DivrollACL();
         acl.setAclWrite(Arrays.asList(adminRole.getEntityId()));
         acl.setAclRead(Arrays.asList(adminRole.getEntityId()));
         userProfile.setAcl(acl);
@@ -824,7 +822,7 @@ public class TestDominoEntity extends TestCase {
 
         adminUser.login("admin", "password");
         Assert.assertNotNull(adminUser.getAuthToken());
-        Assert.assertNotNull(Domino.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
         try {
             userProfile.setBlobProperty("picture", "this is a picture".getBytes("utf-8"));
@@ -850,11 +848,11 @@ public class TestDominoEntity extends TestCase {
         Assert.assertNotNull(userProfile.getProperty("links"));
         Assert.assertTrue(((List)userProfile.getProperty("links")).contains("user"));
 
-        List<DominoEntity> entities = userProfile.links("user");
+        List<DivrollEntity> entities = userProfile.links("user");
         Assert.assertNotNull(entities);
         Assert.assertFalse(entities.isEmpty());
 
-        for(DominoEntity entity : entities) {
+        for(DivrollEntity entity : entities) {
             System.out.println(entity.getEntityId());
             System.out.println(entity.getProperty("entityType"));
         }

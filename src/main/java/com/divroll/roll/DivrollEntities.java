@@ -1,8 +1,8 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
-import com.divroll.domino.exception.BadRequestException;
-import com.divroll.domino.exception.UnauthorizedException;
-import com.divroll.domino.helper.JSON;
+import com.divroll.roll.exception.BadRequestException;
+import com.divroll.roll.exception.UnauthorizedException;
+import com.divroll.roll.helper.JSON;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -16,30 +16,30 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DominoEntities extends DominoBase {
+public class DivrollEntities extends DivrollBase {
 
     private static String entityStoreUrl = "/entities/";
 
-    private List<DominoEntity> entities;
+    private List<DivrollEntity> entities;
     private int skip;
     private int limit;
     private String entityStore;
 
-    private DominoEntities() {}
+    private DivrollEntities() {}
 
-    public DominoEntities(String entityStore) {
+    public DivrollEntities(String entityStore) {
         this.entityStore = entityStore;
         entityStoreUrl = entityStoreUrl + entityStore;
     }
 
-    public List<DominoEntity> getEntities() {
+    public List<DivrollEntity> getEntities() {
         if(entities == null) {
-            entities = new LinkedList<DominoEntity>();
+            entities = new LinkedList<DivrollEntity>();
         }
         return entities;
     }
 
-    public void setEntities(List<DominoEntity> entities) {
+    public void setEntities(List<DivrollEntity> entities) {
         this.entities = entities;
     }
 
@@ -61,20 +61,20 @@ public class DominoEntities extends DominoBase {
 
     public void query() {
         try {
-            GetRequest getRequest = (GetRequest) Unirest.get(Domino.getServerUrl()
+            GetRequest getRequest = (GetRequest) Unirest.get(Divroll.getServerUrl()
                     + entityStoreUrl);
 
-            if(Domino.getMasterKey() != null) {
-                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            if(Divroll.getMasterKey() != null) {
+                getRequest.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                getRequest.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                getRequest.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
             }
-            if(Domino.getAuthToken() != null) {
-                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            if(Divroll.getAuthToken() != null) {
+                getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
@@ -97,59 +97,59 @@ public class DominoEntities extends DominoBase {
                 JSONObject entitiesJSONObject = bodyObj.getJSONObject("entities");
                 JSONArray results = entitiesJSONObject.getJSONArray("results");
                 for(int i=0;i<results.length();i++){
-                    DominoEntity dominoEntity = new DominoEntity(this.entityStore);
+                    DivrollEntity divrollEntity = new DivrollEntity(this.entityStore);
                     JSONObject entityJSONObject = results.getJSONObject(i);
                     Iterator<String> it = entityJSONObject.keySet().iterator();
                     while(it.hasNext()) {
                         String propertyKey = it.next();
                         if( propertyKey.equals("entityId")) {
-                            dominoEntity.setEntityId(entityJSONObject.getString(propertyKey));
+                            divrollEntity.setEntityId(entityJSONObject.getString(propertyKey));
                         }
                         else if (propertyKey.equals("publicRead")) {
                             try {
                                 Boolean value = entityJSONObject.getBoolean("publicRead");
-                                dominoEntity.getAcl().setPublicRead(value);
+                                divrollEntity.getAcl().setPublicRead(value);
                             } catch (Exception e) {
 
                             }
                         } else if(propertyKey.equals("publicWrite")) {
                             try {
                                 Boolean value = entityJSONObject.getBoolean("publicWrite");
-                                dominoEntity.getAcl().setPublicWrite(value);
+                                divrollEntity.getAcl().setPublicWrite(value);
                             } catch (Exception e) {
 
                             }
                         } else if(propertyKey.equals("aclRead")) {
                             try {
                                 List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclRead"));
-                                dominoEntity.getAcl().setAclRead(value);
+                                divrollEntity.getAcl().setAclRead(value);
                             } catch (Exception e) {
 
                             }
                             try {
                                 List<String> value = Arrays.asList(entityJSONObject.getString("aclRead"));
-                                dominoEntity.getAcl().setAclRead(value);
+                                divrollEntity.getAcl().setAclRead(value);
                             } catch (Exception e) {
 
                             }
                         } else if(propertyKey.equals("aclWrite")) {
                             try {
                                 List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclWrite"));
-                                dominoEntity.getAcl().setAclWrite(value);
+                                divrollEntity.getAcl().setAclWrite(value);
                             } catch (Exception e) {
 
                             }
                             try {
                                 List<String> value = Arrays.asList(entityJSONObject.getString("aclWrite"));
-                                dominoEntity.getAcl().setAclWrite(value);
+                                divrollEntity.getAcl().setAclWrite(value);
                             } catch (Exception e) {
 
                             }
                         } else {
-                            dominoEntity.setProperty(propertyKey, entityJSONObject.get(propertyKey));
+                            divrollEntity.setProperty(propertyKey, entityJSONObject.get(propertyKey));
                         }
                     }
-                    getEntities().add(dominoEntity);
+                    getEntities().add(divrollEntity);
                 }
 
             }

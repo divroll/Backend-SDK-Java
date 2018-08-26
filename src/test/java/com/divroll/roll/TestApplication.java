@@ -1,4 +1,4 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
 public class TestApplication {
 

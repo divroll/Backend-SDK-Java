@@ -1,4 +1,4 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
 import junit.framework.TestCase;
 import org.fluttercode.datafactory.impl.DataFactory;
@@ -12,54 +12,54 @@ import org.junit.runners.JUnit4;
 import java.util.Arrays;
 
 @RunWith(JUnit4.class)
-public class TestDominoRoles extends TestCase {
+public class TestDivrollRoles extends TestCase {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testListRolesUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoRole adminRole = new DominoRole();
+        DivrollRole adminRole = new DivrollRole();
         adminRole.setName("Admin");
         adminRole.create();
 
-        DominoRole userRole = new DominoRole();
+        DivrollRole userRole = new DivrollRole();
         userRole.setName("User");
         userRole.create();
 
-        DominoRole managerRole = new DominoRole();
+        DivrollRole managerRole = new DivrollRole();
         managerRole.setName("Manager");
         managerRole.create();
 
-        DominoRoles dominoRoles = new DominoRoles();
-        dominoRoles.query();
+        DivrollRoles divrollRoles = new DivrollRoles();
+        divrollRoles.query();
 
-        assertEquals(3, dominoRoles.getRoles().size());
-        assertEquals("Admin", dominoRoles.getRoles().get(0).getName());
-        assertEquals("User", dominoRoles.getRoles().get(1).getName());
-        assertEquals("Manager", dominoRoles.getRoles().get(2).getName());
+        assertEquals(3, divrollRoles.getRoles().size());
+        assertEquals("Admin", divrollRoles.getRoles().get(0).getName());
+        assertEquals("User", divrollRoles.getRoles().get(1).getName());
+        assertEquals("Manager", divrollRoles.getRoles().get(2).getName());
 
     }
 
     @Test
     public void testGetPublicRoles() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
         DataFactory df = new DataFactory();
 
-        DominoUser admin = new DominoUser();
-        admin.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser admin = new DivrollUser();
+        admin.setAcl(DivrollACL.buildMasterKeyOnly());
         String adminUsername = df.getEmailAddress();
         admin.create(adminUsername, "password");
 
         int size = 10;
         for(int i=0;i<size;i++) {
-            DominoRole role = new DominoRole();
+            DivrollRole role = new DivrollRole();
             role.setName(df.getRandomWord());
-            DominoACL acl = new DominoACL();
+            DivrollACL acl = new DivrollACL();
             acl.setPublicWrite(false);
             acl.setPublicRead(true);
             acl.setAclWrite(Arrays.asList(admin.getEntityId()));
@@ -67,7 +67,7 @@ public class TestDominoRoles extends TestCase {
             role.create();
         }
 
-        DominoRoles roles = new DominoRoles();
+        DivrollRoles roles = new DivrollRoles();
         roles.query();
         Assert.assertEquals(10, roles.getRoles().size());
     }
@@ -75,19 +75,19 @@ public class TestDominoRoles extends TestCase {
     @Test
     public void testGetRolesWithACLUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
         DataFactory df = new DataFactory();
 
-        DominoUser admin = new DominoUser();
-        admin.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser admin = new DivrollUser();
+        admin.setAcl(DivrollACL.buildMasterKeyOnly());
         String adminUsername = df.getEmailAddress();
         admin.create(adminUsername, "password");
 
         for(int i=0;i<10;i++) {
-            DominoRole role = new DominoRole();
+            DivrollRole role = new DivrollRole();
             role.setName(df.getRandomWord());
-            DominoACL acl = new DominoACL();
+            DivrollACL acl = new DivrollACL();
             acl.setPublicWrite(false);
             acl.setPublicRead(true);
             acl.setAclWrite(Arrays.asList(admin.getEntityId()));
@@ -95,14 +95,14 @@ public class TestDominoRoles extends TestCase {
             role.create();
         }
 
-        DominoRoles roles = new DominoRoles();
+        DivrollRoles roles = new DivrollRoles();
         roles.query();
         Assert.assertEquals(10, roles.getRoles().size());
 
         for(int i=0;i<10;i++) {
-            DominoRole role = new DominoRole();
+            DivrollRole role = new DivrollRole();
             role.setName(df.getRandomWord());
-            DominoACL acl = new DominoACL();
+            DivrollACL acl = new DivrollACL();
             acl.setPublicWrite(false);
             acl.setPublicRead(false);
             role.setAcl(acl);
@@ -111,9 +111,9 @@ public class TestDominoRoles extends TestCase {
 
 
         for(int i=0;i<10;i++) {
-            DominoRole role = new DominoRole();
+            DivrollRole role = new DivrollRole();
             role.setName(df.getRandomWord());
-            DominoACL acl = new DominoACL();
+            DivrollACL acl = new DivrollACL();
             acl.setPublicWrite(false);
             acl.setPublicRead(false);
             acl.setAclRead(Arrays.asList(admin.getEntityId()));

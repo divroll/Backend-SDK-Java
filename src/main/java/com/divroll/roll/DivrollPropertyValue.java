@@ -1,13 +1,11 @@
-package com.divroll.domino;
-
-import com.divroll.domino.exception.UnsupportedPropertyValueException;
+package com.divroll.roll;
 
 import java.util.List;
 import java.util.Map;
 
-public class DominoPropertyValue {
+public class DivrollPropertyValue {
     private Object value = null;
-    public DominoPropertyValue(Object value) {
+    public DivrollPropertyValue(Object value) {
 //        System.out.println(value.getClass().getName()); //java.lang.String
 //        System.out.println(String.class.getName());     //java.lang.String
         if(!value.getClass().getName().equalsIgnoreCase(String.class.getName())

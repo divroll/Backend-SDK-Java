@@ -1,9 +1,9 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
-import com.divroll.domino.exception.BadRequestException;
-import com.divroll.domino.exception.DominoException;
-import com.divroll.domino.exception.UnauthorizedException;
-import com.divroll.domino.helper.JSON;
+import com.divroll.roll.exception.BadRequestException;
+import com.divroll.roll.exception.DivrollException;
+import com.divroll.roll.exception.UnauthorizedException;
+import com.divroll.roll.helper.JSON;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DominoUser extends DominoBase {
+public class DivrollUser extends DivrollBase {
 
     private static final String usersUrl = "/entities/users";
     private static final String loginUrl = "/entities/users/login";
@@ -26,8 +26,8 @@ public class DominoUser extends DominoBase {
     private String username;
     private String password;
     private String authToken;
-    private DominoACL acl;
-    private List<DominoRole> roles;
+    private DivrollACL acl;
+    private List<DivrollRole> roles;
 
     public void create(String username, String password) {
         try {
@@ -35,18 +35,18 @@ public class DominoUser extends DominoBase {
             setUsername(username);
             setPassword(password);
 
-            HttpRequestWithBody httpRequestWithBody = Unirest.post(Domino.getServerUrl() + usersUrl);
-            if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            HttpRequestWithBody httpRequestWithBody = Unirest.post(Divroll.getServerUrl() + usersUrl);
+            if(Divroll.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
             }
-            if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header("X-Domino-Auth-Key", Domino.getAuthToken());
+            if(Divroll.getAuthToken() != null) {
+                httpRequestWithBody.header("X-Divroll-Auth-Key", Divroll.getAuthToken());
             }
             JSONObject userObj = new JSONObject();
             userObj.put("username", username);
@@ -58,7 +58,7 @@ public class DominoUser extends DominoBase {
             JSONObject body = new JSONObject();
 
             JSONArray roles = new JSONArray();
-            for(DominoRole role : getRoles()) {
+            for(DivrollRole role : getRoles()) {
                 JSONObject roleObj = new JSONObject();
                 roleObj.put("entityId", role.getEntityId());
                 roles.put(roleObj);
@@ -80,8 +80,8 @@ public class DominoUser extends DominoBase {
 
             System.out.println("REQUEST: " + body.toString());
 
-            httpRequestWithBody.header("X-Domino-ACL-Read", aclRead.toString());
-            httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
             HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
@@ -145,36 +145,36 @@ public class DominoUser extends DominoBase {
 
                 }
 
-                List<DominoRole> dominoRoles = null;
+                List<DivrollRole> divrollRoles = null;
                 try {
                     Object rolesObj = responseUser.get("roles");
                     if(roles instanceof JSONArray) {
-                        dominoRoles = new LinkedList<DominoRole>();
+                        divrollRoles = new LinkedList<DivrollRole>();
                         JSONArray jsonArray = (JSONArray) roles;
                         for(int i=0;i<jsonArray.length();i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             String roleId = jsonObject.getString("entityId");
-                            DominoRole dominoRole = new DominoRole();
-                            dominoRole.setEntityId(roleId);
-                            dominoRoles.add(dominoRole);
+                            DivrollRole divrollRole = new DivrollRole();
+                            divrollRole.setEntityId(roleId);
+                            divrollRoles.add(divrollRole);
                         }
                     } else if(rolesObj instanceof JSONObject) {
-                        dominoRoles = new LinkedList<DominoRole>();
+                        divrollRoles = new LinkedList<DivrollRole>();
                         JSONObject jsonObject = (JSONObject) rolesObj;
                         String roleId = jsonObject.getString("entityId");
-                        DominoRole dominoRole = new DominoRole();
-                        dominoRole.setEntityId(roleId);
-                        dominoRoles.add(dominoRole);
+                        DivrollRole divrollRole = new DivrollRole();
+                        divrollRole.setEntityId(roleId);
+                        divrollRoles.add(divrollRole);
                     }
                 } catch (Exception e) {
                     // do nothing
                 }
 
-                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
                 acl.setPublicWrite(publicWrite);
                 acl.setPublicRead(publicRead);
                 setAcl(acl);
-                setRoles(dominoRoles);
+                setRoles(divrollRoles);
 
             }
         } catch (UnirestException e) {
@@ -183,20 +183,20 @@ public class DominoUser extends DominoBase {
     }
     public void retrieve() {
         try {
-            GetRequest getRequest = (GetRequest) Unirest.get(Domino.getServerUrl()
+            GetRequest getRequest = (GetRequest) Unirest.get(Divroll.getServerUrl()
                     + usersUrl + "/" + getEntityId());
 
-            if(Domino.getMasterKey() != null) {
-                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            if(Divroll.getMasterKey() != null) {
+                getRequest.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                getRequest.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                getRequest.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
             }
-            if(Domino.getAuthToken() != null) {
-                getRequest.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            if(Divroll.getAuthToken() != null) {
+                getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
@@ -259,39 +259,39 @@ public class DominoUser extends DominoBase {
 
                 }
 
-                List<DominoRole> dominoRoles = null;
+                List<DivrollRole> divrollRoles = null;
                 try {
                     Object roles = userJsonObj.get("roles");
                     if(roles instanceof JSONArray) {
-                        dominoRoles = new LinkedList<DominoRole>();
+                        divrollRoles = new LinkedList<DivrollRole>();
                         JSONArray jsonArray = (JSONArray) roles;
                         for(int i=0;i<jsonArray.length();i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             String roleId = jsonObject.getString("entityId");
-                            DominoRole dominoRole = new DominoRole();
-                            dominoRole.setEntityId(roleId);
-                            dominoRoles.add(dominoRole);
+                            DivrollRole divrollRole = new DivrollRole();
+                            divrollRole.setEntityId(roleId);
+                            divrollRoles.add(divrollRole);
                         }
                     } else if(roles instanceof JSONObject) {
-                        dominoRoles = new LinkedList<DominoRole>();
+                        divrollRoles = new LinkedList<DivrollRole>();
                         JSONObject jsonObject = (JSONObject) roles;
                         String roleId = jsonObject.getString("entityId");
-                        DominoRole dominoRole = new DominoRole();
-                        dominoRole.setEntityId(roleId);
-                        dominoRoles.add(dominoRole);
+                        DivrollRole divrollRole = new DivrollRole();
+                        divrollRole.setEntityId(roleId);
+                        divrollRoles.add(divrollRole);
                     }
                 } catch (Exception e) {
                     // do nothing
                 }
 
-                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
                 acl.setPublicWrite(publicWrite);
                 acl.setPublicRead(publicRead);
 
                 setEntityId(entityId);
                 setUsername(username);
                 setAcl(acl);
-                setRoles(dominoRoles);
+                setRoles(divrollRoles);
 
             }
         } catch (UnirestException e) {
@@ -302,20 +302,20 @@ public class DominoUser extends DominoBase {
     public void update(String newUsername, String newPassword) {
         try {
 
-            String completeUrl = Domino.getServerUrl() + usersUrl + "/" + getEntityId();
+            String completeUrl = Divroll.getServerUrl() + usersUrl + "/" + getEntityId();
             System.out.println(completeUrl);
             HttpRequestWithBody httpRequestWithBody = Unirest.put(completeUrl);
-            if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            if(Divroll.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
             }
-            if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            if(Divroll.getAuthToken() != null) {
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
             JSONObject userObj = new JSONObject();
             if(username != null) {
@@ -331,7 +331,7 @@ public class DominoUser extends DominoBase {
             JSONObject body = new JSONObject();
 
             JSONArray roles = new JSONArray();
-            for(DominoRole role : getRoles()) {
+            for(DivrollRole role : getRoles()) {
                 JSONObject roleObj = new JSONObject();
                 roleObj.put("entityId", role.getEntityId());
                 roles.put(roleObj);
@@ -351,8 +351,8 @@ public class DominoUser extends DominoBase {
                 }
             }
 
-            httpRequestWithBody.header("X-Domino-ACL-Read", aclRead.toString());
-            httpRequestWithBody.header("X-Domino-ACL-Write", aclWrite.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
+            httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
             System.out.println("REQUEST: " + body.toString());
@@ -360,13 +360,13 @@ public class DominoUser extends DominoBase {
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
 
             if(response.getStatus() >= 500) {
-                throw new DominoException(response.getStatusText());
+                throw new DivrollException(response.getStatusText());
             } else if(response.getStatus() == 400) {
                 throw new BadRequestException(response.getStatusText());
             } else if(response.getStatus() == 401) {
                 throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() == 404) {
-                throw new DominoException(response.getStatusText());
+                throw new DivrollException(response.getStatusText());
             } else if(response.getStatus() >= 400) {
                 throwException(response);
             } else if(response.getStatus() == 200) {
@@ -429,32 +429,32 @@ public class DominoUser extends DominoBase {
 
                 }
 
-                List<DominoRole> dominoRoles = null;
+                List<DivrollRole> divrollRoles = null;
                 try {
                     Object roleObjects = userObj.get("roles");
                     if(roleObjects instanceof JSONArray) {
-                        dominoRoles = new LinkedList<DominoRole>();
+                        divrollRoles = new LinkedList<DivrollRole>();
                         JSONArray jsonArray = (JSONArray) roles;
                         for(int i=0;i<jsonArray.length();i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             String roleId = jsonObject.getString("entityId");
-                            DominoRole dominoRole = new DominoRole();
-                            dominoRole.setEntityId(roleId);
-                            dominoRoles.add(dominoRole);
+                            DivrollRole divrollRole = new DivrollRole();
+                            divrollRole.setEntityId(roleId);
+                            divrollRoles.add(divrollRole);
                         }
                     } else if(roleObjects instanceof JSONObject) {
-                        dominoRoles = new LinkedList<DominoRole>();
+                        divrollRoles = new LinkedList<DivrollRole>();
                         JSONObject jsonObject = (JSONObject) roleObjects;
                         String roleId = jsonObject.getString("entityId");
-                        DominoRole dominoRole = new DominoRole();
-                        dominoRole.setEntityId(roleId);
-                        dominoRoles.add(dominoRole);
+                        DivrollRole divrollRole = new DivrollRole();
+                        divrollRole.setEntityId(roleId);
+                        divrollRoles.add(divrollRole);
                     }
                 } catch (Exception e) {
 
                 }
 
-                DominoACL acl = new DominoACL(aclReadList, aclWriteList);
+                DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
                 acl.setPublicRead(publicRead);
                 acl.setPublicWrite(publicWrite);
                 setEntityId(entityId);
@@ -462,7 +462,7 @@ public class DominoUser extends DominoBase {
                     setUsername(updatedUsername);
                 }
                 setAcl(acl);
-                setRoles(dominoRoles);
+                setRoles(divrollRoles);
             }
         } catch (UnirestException e) {
             e.printStackTrace();
@@ -475,19 +475,19 @@ public class DominoUser extends DominoBase {
 
     public boolean delete() {
         try {
-            HttpRequestWithBody httpRequestWithBody = Unirest.delete(Domino.getServerUrl()
+            HttpRequestWithBody httpRequestWithBody = Unirest.delete(Divroll.getServerUrl()
                     + usersUrl + "/" + getEntityId());
-            if(Domino.getMasterKey() != null) {
-                httpRequestWithBody.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            if(Divroll.getMasterKey() != null) {
+                httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                httpRequestWithBody.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                httpRequestWithBody.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                httpRequestWithBody.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
             }
-            if(Domino.getAuthToken() != null) {
-                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Domino.getAuthToken());
+            if(Divroll.getAuthToken() != null) {
+                httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
             HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
             if(response.getStatus() >= 500) {
@@ -516,17 +516,17 @@ public class DominoUser extends DominoBase {
         setUsername(username);
         setPassword(password);
         try {
-            GetRequest getRequest = (GetRequest) Unirest.get(Domino.getServerUrl() + loginUrl)
+            GetRequest getRequest = (GetRequest) Unirest.get(Divroll.getServerUrl() + loginUrl)
                     .queryString("username", getUsername())
                     .queryString("password", getPassword());
-            if(Domino.getMasterKey() != null) {
-                getRequest.header(HEADER_MASTER_KEY, Domino.getMasterKey());
+            if(Divroll.getMasterKey() != null) {
+                getRequest.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
             }
-            if(Domino.getAppId() != null) {
-                getRequest.header(HEADER_APP_ID, Domino.getAppId());
+            if(Divroll.getAppId() != null) {
+                getRequest.header(HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                getRequest.header(HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
             }
             HttpResponse<JsonNode> response = getRequest.asJson();
             if(response.getStatus() == 404) {
@@ -541,7 +541,7 @@ public class DominoUser extends DominoBase {
                 String webToken = user.getString("webToken");
                 setEntityId(entityId);
                 setAuthToken(webToken);
-                Domino.setAuthToken(webToken);
+                Divroll.setAuthToken(webToken);
             }
         } catch (UnirestException e) {
             e.printStackTrace();
@@ -549,7 +549,7 @@ public class DominoUser extends DominoBase {
     }
 
     public void logout() {
-        Domino.setAuthToken(null);
+        Divroll.setAuthToken(null);
     }
 
     public String getEntityId() {
@@ -576,11 +576,11 @@ public class DominoUser extends DominoBase {
         this.password = password;
     }
 
-    public DominoACL getAcl() {
+    public DivrollACL getAcl() {
         return acl;
     }
 
-    public void setAcl(DominoACL acl) {
+    public void setAcl(DivrollACL acl) {
         this.acl = acl;
     }
 
@@ -592,14 +592,14 @@ public class DominoUser extends DominoBase {
         this.authToken = authToken;
     }
 
-    public List<DominoRole> getRoles() {
+    public List<DivrollRole> getRoles() {
         if(roles == null) {
-            roles = new LinkedList<DominoRole>();
+            roles = new LinkedList<DivrollRole>();
         }
         return roles;
     }
 
-    public void setRoles(List<DominoRole> roles) {
+    public void setRoles(List<DivrollRole> roles) {
         this.roles = roles;
     }
 }

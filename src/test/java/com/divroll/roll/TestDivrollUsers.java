@@ -1,4 +1,4 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
 import junit.framework.TestCase;
 import org.fluttercode.datafactory.impl.DataFactory;
@@ -12,14 +12,14 @@ import org.junit.runners.JUnit4;
 import java.util.Arrays;
 
 @RunWith(JUnit4.class)
-public class TestDominoUsers extends TestCase {
+public class TestDivrollUsers extends TestCase {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testGetApplication() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
         Assert.assertNotNull(application.getApiToken());
         Assert.assertNotNull(application.getAppId());
         Assert.assertNotNull(application.getMasterKey());
@@ -29,15 +29,15 @@ public class TestDominoUsers extends TestCase {
     public void testGetUsers() {
         System.out.println("Running testGetUsers");
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
         DataFactory df = new DataFactory();
         for(int i=0;i<100;i++) {
-            DominoUser dominoUser = new DominoUser();
-            dominoUser.create(df.getEmailAddress(), "password");
+            DivrollUser divrollUser = new DivrollUser();
+            divrollUser.create(df.getEmailAddress(), "password");
         }
 
-        DominoUsers users = new DominoUsers();
+        DivrollUsers users = new DivrollUsers();
         users.query();
 
         Assert.assertEquals(100, users.getUsers().size());
@@ -46,16 +46,16 @@ public class TestDominoUsers extends TestCase {
     @Test
     public void testGetUsersMasterKeyOnly() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
         DataFactory df = new DataFactory();
         for(int i=0;i<100;i++) {
-            DominoUser dominoUser = new DominoUser();
-            dominoUser.setAcl(DominoACL.buildMasterKeyOnly());
-            dominoUser.create(df.getEmailAddress(), "password");
+            DivrollUser divrollUser = new DivrollUser();
+            divrollUser.setAcl(DivrollACL.buildMasterKeyOnly());
+            divrollUser.create(df.getEmailAddress(), "password");
         }
 
-        DominoUsers users = new DominoUsers();
+        DivrollUsers users = new DivrollUsers();
         users.query();
 
         Assert.assertEquals(0, users.getUsers().size());
@@ -64,65 +64,65 @@ public class TestDominoUsers extends TestCase {
     @Test
     public void testGetUsersWithACLUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
         DataFactory df = new DataFactory();
 
-        DominoUser admin = new DominoUser();
-        admin.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser admin = new DivrollUser();
+        admin.setAcl(DivrollACL.buildMasterKeyOnly());
         String adminUsername = df.getEmailAddress();
         admin.create(adminUsername, "password");
 
         int size = 10;
         for(int i=0;i<size;i++) {
-            DominoUser dominoUser = new DominoUser();
-            DominoACL acl = new DominoACL();
+            DivrollUser divrollUser = new DivrollUser();
+            DivrollACL acl = new DivrollACL();
             acl.setPublicWrite(false);
             acl.setPublicRead(false);
             acl.setAclRead(Arrays.asList(admin.getEntityId()));
             acl.setAclWrite(Arrays.asList(admin.getEntityId()));
-            dominoUser.setAcl(acl);
-            dominoUser.create(df.getEmailAddress(), "password");
+            divrollUser.setAcl(acl);
+            divrollUser.create(df.getEmailAddress(), "password");
         }
 
-        DominoUsers users = new DominoUsers();
+        DivrollUsers users = new DivrollUsers();
         users.query();
 
         Assert.assertEquals(0, users.getUsers().size());
 
         admin.login(adminUsername, "password");
 
-        users = new DominoUsers();
+        users = new DivrollUsers();
         users.query();
 
         Assert.assertEquals(size, users.getUsers().size());
 
         size = 20;
         for(int i=0;i<size;i++) {
-            DominoUser dominoUser = new DominoUser();
-            DominoACL acl = new DominoACL();
+            DivrollUser divrollUser = new DivrollUser();
+            DivrollACL acl = new DivrollACL();
             acl.setPublicWrite(false);
             acl.setPublicRead(true);
-            dominoUser.setAcl(acl);
-            dominoUser.create(df.getEmailAddress(), "password");
+            divrollUser.setAcl(acl);
+            divrollUser.create(df.getEmailAddress(), "password");
         }
 
-        users = new DominoUsers();
+        users = new DivrollUsers();
         users.query();
 
         Assert.assertEquals(30, users.getUsers().size());
 
         size = 20;
         for(int i=0;i<size;i++) {
-            DominoUser dominoUser = new DominoUser();
-            DominoACL acl = new DominoACL();
+            DivrollUser divrollUser = new DivrollUser();
+            DivrollACL acl = new DivrollACL();
             acl.setPublicWrite(true);
             acl.setPublicRead(false);
-            dominoUser.setAcl(acl);
-            dominoUser.create(df.getEmailAddress(), "password");
+            divrollUser.setAcl(acl);
+            divrollUser.create(df.getEmailAddress(), "password");
         }
 
-        users = new DominoUsers();
+        users = new DivrollUsers();
         users.query();
 
         Assert.assertEquals(30, users.getUsers().size());

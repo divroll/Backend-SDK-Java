@@ -1,4 +1,4 @@
-package com.divroll.domino.helper;
+package com.divroll.roll.helper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

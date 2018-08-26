@@ -1,9 +1,8 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
-import com.divroll.domino.exception.BadRequestException;
-import com.divroll.domino.exception.UnauthorizedException;
+import com.divroll.roll.exception.BadRequestException;
+import com.divroll.roll.exception.UnauthorizedException;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,10 +11,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 @RunWith(JUnit4.class)
-public class TestDominoRole extends TestCase {
+public class TestDivrollRole extends TestCase {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -23,9 +21,9 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testCreateRolePublic() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
         Assert.assertNotNull(role.getEntityId());
         Assert.assertEquals("Admin", role.getName());
@@ -38,10 +36,10 @@ public class TestDominoRole extends TestCase {
     @Test(expected = BadRequestException.class)
     public void testCreateRoleInvalidACLShouldThrowException() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        DominoACL acl = DominoACL.build();
+        DivrollRole role = new DivrollRole("Admin");
+        DivrollACL acl = DivrollACL.build();
         acl.setAclWrite(Arrays.asList("")); // invalid
         acl.setAclRead(Arrays.asList(""));  // invalid
         role.setAcl(acl);
@@ -53,9 +51,9 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testCreateRoleMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
+        DivrollRole role = new DivrollRole("Admin");
         role.setAcl(null);
         role.create();
 
@@ -68,9 +66,9 @@ public class TestDominoRole extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testCreateRoleMasterKeyOnlyShouldThrowException() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
+        DivrollRole role = new DivrollRole("Admin");
         role.setAcl(null);
         role.create();
 
@@ -87,10 +85,10 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testCreateRoleMasterKeyOnly() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildMasterKeyOnly());
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
@@ -107,16 +105,16 @@ public class TestDominoRole extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testCreateRoleInvalidAppId() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize("WRONG", application.getApiToken());
-        DominoRole role = new DominoRole("Admin");
+        Divroll.initialize("WRONG", application.getApiToken());
+        DivrollRole role = new DivrollRole("Admin");
         role.create();
     }
 
     @Test(expected = UnauthorizedException.class)
     public void testCreateRoleInvalidApiToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), "WRONG");
-        DominoRole role = new DominoRole("Admin");
+        Divroll.initialize(application.getAppId(), "WRONG");
+        DivrollRole role = new DivrollRole("Admin");
         role.create();
     }
 
@@ -128,15 +126,15 @@ public class TestDominoRole extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testGetRoleInvalidAppId() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
-        DominoRole role = new DominoRole("Admin");
+        Divroll.initialize(application.getAppId(), application.getApiToken());
+        DivrollRole role = new DivrollRole("Admin");
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
         Assert.assertNotNull(role.getAcl());
         Assert.assertNotNull(role.getName());
 
-        Domino.initialize("WRONG", application.getApiToken());
+        Divroll.initialize("WRONG", application.getApiToken());
         role.retrieve();
         Assert.assertNull(role.getEntityId());
         Assert.assertNull(role.getAcl());
@@ -146,15 +144,15 @@ public class TestDominoRole extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testGetRoleInvalidApiToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
-        DominoRole role = new DominoRole("Admin");
+        Divroll.initialize(application.getAppId(), application.getApiToken());
+        DivrollRole role = new DivrollRole("Admin");
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
         Assert.assertNotNull(role.getAcl());
         Assert.assertNotNull(role.getName());
 
-        Domino.initialize(application.getAppId(), "WRONG");
+        Divroll.initialize(application.getAppId(), "WRONG");
         role.retrieve();
         Assert.assertNull(role.getEntityId());
         Assert.assertNull(role.getAcl());
@@ -169,78 +167,78 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testCreateAndGetRoleWithACLUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser dominoUser = new DominoUser();
-        dominoUser.create("admin", "password");
+        DivrollUser divrollUser = new DivrollUser();
+        divrollUser.create("admin", "password");
 
-        Assert.assertNotNull(dominoUser.getEntityId());
+        Assert.assertNotNull(divrollUser.getEntityId());
 
-        String userId = dominoUser.getEntityId();
+        String userId = divrollUser.getEntityId();
 
-        DominoRole dominoRole = new DominoRole();
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setPublicRead(true);
-        dominoACL.setAclWrite(Arrays.asList(userId));
+        DivrollRole divrollRole = new DivrollRole();
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setPublicRead(true);
+        divrollACL.setAclWrite(Arrays.asList(userId));
 
-        dominoRole.setAcl(dominoACL);
-        dominoRole.setName("Admin");
-        dominoRole.create();
+        divrollRole.setAcl(divrollACL);
+        divrollRole.setName("Admin");
+        divrollRole.create();
 
-        Assert.assertNotNull(dominoRole.getEntityId());
-        Assert.assertTrue(dominoRole.getAcl().getAclWrite().contains("0-0"));
-        Assert.assertTrue(dominoRole.getAcl().getPublicRead());
+        Assert.assertNotNull(divrollRole.getEntityId());
+        Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+        Assert.assertTrue(divrollRole.getAcl().getPublicRead());
 
-        dominoUser.login("admin", "password");
-        Assert.assertNotNull(dominoUser.getAuthToken());
-        Assert.assertNotNull(Domino.getAuthToken());
+        divrollUser.login("admin", "password");
+        Assert.assertNotNull(divrollUser.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
-        dominoRole.retrieve();
+        divrollRole.retrieve();
 //
-        Assert.assertNotNull(dominoRole.getEntityId());
-        Assert.assertTrue(dominoRole.getAcl().getAclWrite().contains("0-0"));
-        Assert.assertTrue(dominoRole.getAcl().getPublicRead());
+        Assert.assertNotNull(divrollRole.getEntityId());
+        Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+        Assert.assertTrue(divrollRole.getAcl().getPublicRead());
     }
 
     @Test(expected = UnauthorizedException.class)
     public void testCreateAndGetRoleWithACLMissingAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser dominoUser = new DominoUser();
-        dominoUser.create("admin", "password");
+        DivrollUser divrollUser = new DivrollUser();
+        divrollUser.create("admin", "password");
 
-        Assert.assertNotNull(dominoUser.getEntityId());
+        Assert.assertNotNull(divrollUser.getEntityId());
 
-        String userId = dominoUser.getEntityId();
+        String userId = divrollUser.getEntityId();
 
-        DominoRole dominoRole = new DominoRole();
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setAclRead(Arrays.asList(userId));
-        dominoACL.setAclWrite(Arrays.asList(userId));
+        DivrollRole divrollRole = new DivrollRole();
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setAclRead(Arrays.asList(userId));
+        divrollACL.setAclWrite(Arrays.asList(userId));
 
-        dominoRole.setAcl(dominoACL);
-        dominoRole.setName("Admin");
-        dominoRole.create();
+        divrollRole.setAcl(divrollACL);
+        divrollRole.setName("Admin");
+        divrollRole.create();
 
-        Assert.assertNotNull(dominoRole.getEntityId());
-        Assert.assertTrue(dominoRole.getAcl().getAclWrite().contains("0-0"));
-        Assert.assertTrue(dominoRole.getAcl().getAclRead().contains("0-0"));
+        Assert.assertNotNull(divrollRole.getEntityId());
+        Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+        Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
 
-        dominoRole.retrieve();
+        divrollRole.retrieve();
 
-        Assert.assertNotNull(dominoRole.getEntityId());
-        Assert.assertTrue(dominoRole.getAcl().getAclWrite().contains("0-0"));
-        Assert.assertTrue(dominoRole.getAcl().getAclRead().contains("0-0"));
+        Assert.assertNotNull(divrollRole.getEntityId());
+        Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+        Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
     }
 
     @Test
     public void testUpdatePublicRoleMissingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         String roleId = role.getEntityId();
@@ -261,43 +259,43 @@ public class TestDominoRole extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testUpdateRoleWithACLMissingAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoUser dominoUser = new DominoUser();
-        dominoUser.create("admin", "password");
+        DivrollUser divrollUser = new DivrollUser();
+        divrollUser.create("admin", "password");
 
-        Assert.assertNotNull(dominoUser.getEntityId());
+        Assert.assertNotNull(divrollUser.getEntityId());
 
-        String userId = dominoUser.getEntityId();
+        String userId = divrollUser.getEntityId();
 
-        DominoRole dominoRole = new DominoRole();
-        DominoACL dominoACL = DominoACL.build();
-        dominoACL.setAclRead(Arrays.asList(userId));
-        dominoACL.setAclWrite(Arrays.asList(userId));
+        DivrollRole divrollRole = new DivrollRole();
+        DivrollACL divrollACL = DivrollACL.build();
+        divrollACL.setAclRead(Arrays.asList(userId));
+        divrollACL.setAclWrite(Arrays.asList(userId));
 
-        dominoRole.setAcl(dominoACL);
-        dominoRole.setName("Admin");
-        dominoRole.create();
+        divrollRole.setAcl(divrollACL);
+        divrollRole.setName("Admin");
+        divrollRole.create();
 
-        Assert.assertNotNull(dominoRole.getEntityId());
-        Assert.assertTrue(dominoRole.getAcl().getAclWrite().contains("0-0"));
-        Assert.assertTrue(dominoRole.getAcl().getAclRead().contains("0-0"));
+        Assert.assertNotNull(divrollRole.getEntityId());
+        Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+        Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
 
-        dominoRole.setName("Super Admin");
-        dominoRole.update();
+        divrollRole.setName("Super Admin");
+        divrollRole.update();
 
-        Assert.assertNotNull(dominoRole.getEntityId());
-        Assert.assertTrue(dominoRole.getAcl().getAclWrite().contains("0-0"));
-        Assert.assertTrue(dominoRole.getAcl().getAclRead().contains("0-0"));
+        Assert.assertNotNull(divrollRole.getEntityId());
+        Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+        Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
     }
 
     @Test
     public void testUpdatePublicRoleUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         String roleId = role.getEntityId();
@@ -307,9 +305,9 @@ public class TestDominoRole extends TestCase {
         Assert.assertTrue(role.getAcl().getPublicRead());
         Assert.assertTrue(role.getAcl().getPublicWrite());
 
-        DominoUser dominoUser = new DominoUser();
-        dominoUser.create("admin", "password");
-        dominoUser.login("admin", "password");
+        DivrollUser divrollUser = new DivrollUser();
+        divrollUser.create("admin", "password");
+        divrollUser.login("admin", "password");
 
         role.setName("Super Admin");
         role.update();
@@ -323,10 +321,10 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testUpdatePublicRoleUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         String roleId = role.getEntityId();
@@ -353,10 +351,10 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testUpdatePublicRoleChangeACLUsingMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         String roleId = role.getEntityId();
@@ -369,7 +367,7 @@ public class TestDominoRole extends TestCase {
         Assert.assertTrue(role.getAcl().getPublicRead());
         Assert.assertTrue(role.getAcl().getPublicWrite());
 
-        role.setAcl(DominoACL.buildMasterKeyOnly());
+        role.setAcl(DivrollACL.buildMasterKeyOnly());
         role.update();
 
         Assert.assertEquals("Admin", role.getName());
@@ -386,10 +384,10 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testUpdatePublicRoleChangeACLUsingAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         String roleId = role.getEntityId();
@@ -402,7 +400,7 @@ public class TestDominoRole extends TestCase {
         Assert.assertTrue(role.getAcl().getPublicRead());
         Assert.assertTrue(role.getAcl().getPublicWrite());
 
-        role.setAcl(DominoACL.buildMasterKeyOnly());
+        role.setAcl(DivrollACL.buildMasterKeyOnly());
         role.update();
 
         Assert.assertEquals("Admin", role.getName());
@@ -413,16 +411,16 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testCreateUserWithRole() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
         String adminRoleId = role.getEntityId();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.create("admin", "password");
     }
@@ -430,20 +428,20 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testCreateUserWithRoles() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
-        DominoRole managerRole = new DominoRole("Manager");
-        managerRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole managerRole = new DivrollRole("Manager");
+        managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         managerRole.create();
 
         String adminRoleId = role.getEntityId();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.getRoles().add(managerRole);
         adminUser.create("admin", "password");
@@ -452,20 +450,20 @@ public class TestDominoRole extends TestCase {
     @Test(expected = BadRequestException.class)
     public void testCreateUserWithRolesThenUpdateRoleWithoutAuthTokenShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
-        DominoRole managerRole = new DominoRole("Manager");
-        managerRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole managerRole = new DivrollRole("Manager");
+        managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         managerRole.create();
 
         String adminRoleId = role.getEntityId();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.getRoles().add(managerRole);
         adminUser.create("admin", "password");
@@ -480,20 +478,20 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testCreateUserWithRolesThenUpdateRole() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
-        DominoRole managerRole = new DominoRole("Manager");
-        managerRole.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole managerRole = new DivrollRole("Manager");
+        managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         managerRole.create();
 
         String adminRoleId = role.getEntityId();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.getRoles().add(managerRole);
         adminUser.create("admin", "password");
@@ -513,26 +511,26 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testUpdateUserWithAuthTokenWithRole() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
         String adminRoleId = role.getEntityId();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.create("admin", "password");
 
-        DominoUser dominoUser = new DominoUser();
-        DominoACL userACL = new DominoACL();
+        DivrollUser divrollUser = new DivrollUser();
+        DivrollACL userACL = new DivrollACL();
         userACL.setPublicRead(true);
         userACL.setPublicWrite(false);
         userACL.setAclWrite(Arrays.asList(adminRoleId));
-        dominoUser.setAcl(userACL);
-        dominoUser.create("user", "password");
+        divrollUser.setAcl(userACL);
+        divrollUser.create("user", "password");
 
         Assert.assertNotNull(adminUser.getRoles());
         Assert.assertFalse(adminUser.getRoles().isEmpty());
@@ -541,21 +539,21 @@ public class TestDominoRole extends TestCase {
         String authToken = adminUser.getAuthToken();
 
         Assert.assertNotNull(authToken);
-        Assert.assertNotNull(Domino.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
         System.out.println("Updating...");
 
-        dominoUser.update("new_username", "new_password");
-        Assert.assertEquals("new_username", dominoUser.getUsername());
+        divrollUser.update("new_username", "new_password");
+        Assert.assertEquals("new_username", divrollUser.getUsername());
     }
 
     @Test
     public void testDeletePublicRole() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
@@ -566,10 +564,10 @@ public class TestDominoRole extends TestCase {
     @Test(expected = BadRequestException.class)
     public void testDeletePublicRoleThenRetrieveShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
@@ -584,16 +582,16 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testDeletePublicRoleWithAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.create("admin", "password");
 
         adminUser.login("admin", "password");
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
@@ -606,16 +604,16 @@ public class TestDominoRole extends TestCase {
     @Test(expected = BadRequestException.class)
     public void testDeletePublicRoleWithAuthTokenThenRetrieveShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.create("admin", "password");
 
         adminUser.login("admin", "password");
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
@@ -632,10 +630,10 @@ public class TestDominoRole extends TestCase {
     @Test
     public void testDeletePublicRoleWithMasterKey() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
@@ -646,10 +644,10 @@ public class TestDominoRole extends TestCase {
     @Test(expected = BadRequestException.class)
     public void testDeletePublicRoleWithMasterKeyTheRetrieveShouldFail() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+        Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadWrite());
         role.create();
 
         Assert.assertNotNull(role.getEntityId());
@@ -664,16 +662,16 @@ public class TestDominoRole extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testDeleteRoleWithACLWithAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
         String adminRoleId = role.getEntityId();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.create("admin", "password");
 
@@ -684,7 +682,7 @@ public class TestDominoRole extends TestCase {
         String authToken = adminUser.getAuthToken();
 
         Assert.assertNotNull(authToken);
-        Assert.assertNotNull(Domino.getAuthToken());
+        Assert.assertNotNull(Divroll.getAuthToken());
 
         role.delete();
     }
@@ -692,14 +690,14 @@ public class TestDominoRole extends TestCase {
     @Test(expected = UnauthorizedException.class)
     public void testDeleteRoleWithACLWithoutAuthToken() {
         TestApplication application = TestData.getNewApplication();
-        Domino.initialize(application.getAppId(), application.getApiToken());
+        Divroll.initialize(application.getAppId(), application.getApiToken());
 
-        DominoRole role = new DominoRole("Admin");
-        role.setAcl(DominoACL.buildPublicReadMasterKeyWrite());
+        DivrollRole role = new DivrollRole("Admin");
+        role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
         role.create();
 
-        DominoUser adminUser = new DominoUser();
-        adminUser.setAcl(DominoACL.buildMasterKeyOnly());
+        DivrollUser adminUser = new DivrollUser();
+        adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
         adminUser.getRoles().add(role);
         adminUser.create("admin", "password");
 

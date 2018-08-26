@@ -1,22 +1,25 @@
-package com.divroll.domino;
+package com.divroll.roll;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
+import org.fluttercode.datafactory.impl.DataFactory;
 import org.json.JSONObject;
 
 public class TestData {
 
     public static TestApplication getNewApplication() {
         try {
-            GetRequest getRequest = (GetRequest) Unirest.get(Domino.getServerUrl() + "/applications");
-            if(Domino.getAppId() != null) {
-                getRequest.header(DominoBase.HEADER_APP_ID, Domino.getAppId());
+            DataFactory df = new DataFactory();
+            GetRequest getRequest = (GetRequest) Unirest.get(
+                    Divroll.getServerUrl() + "/applications/" + df.getName());
+            if(Divroll.getAppId() != null) {
+                getRequest.header(DivrollBase.HEADER_APP_ID, Divroll.getAppId());
             }
-            if(Domino.getApiKey() != null) {
-                getRequest.header(DominoBase.HEADER_API_KEY, Domino.getApiKey());
+            if(Divroll.getApiKey() != null) {
+                getRequest.header(DivrollBase.HEADER_API_KEY, Divroll.getApiKey());
             }
             HttpResponse<JsonNode> response = getRequest.asJson();
             if(response.getStatus() == 404) {
