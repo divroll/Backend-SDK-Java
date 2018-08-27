@@ -116,13 +116,13 @@ public class DivrollUsers extends DivrollBase {
                     List<String> aclReadList = null;
 
                     try {
-                        aclWriteList = JSON.toList(userObj.getJSONArray("aclWrite"));
+                        aclWriteList = JSON.aclJSONArrayToList(userObj.getJSONArray("aclWrite"));
                     } catch (Exception e) {
 
                     }
 
                     try {
-                        aclReadList = JSON.toList(userObj.getJSONArray("aclRead"));
+                        aclReadList = JSON.aclJSONArrayToList(userObj.getJSONArray("aclRead"));
                     } catch (Exception e) {
 
                     }

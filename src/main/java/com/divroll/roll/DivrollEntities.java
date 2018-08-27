@@ -121,7 +121,7 @@ public class DivrollEntities extends DivrollBase {
                             }
                         } else if(propertyKey.equals("aclRead")) {
                             try {
-                                List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclRead"));
+                                List<String> value = JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclRead"));
                                 divrollEntity.getAcl().setAclRead(value);
                             } catch (Exception e) {
 
@@ -134,7 +134,7 @@ public class DivrollEntities extends DivrollBase {
                             }
                         } else if(propertyKey.equals("aclWrite")) {
                             try {
-                                List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclWrite"));
+                                List<String> value = JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclWrite"));
                                 divrollEntity.getAcl().setAclWrite(value);
                             } catch (Exception e) {
 

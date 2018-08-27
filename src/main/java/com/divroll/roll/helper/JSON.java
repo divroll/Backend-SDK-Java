@@ -7,12 +7,15 @@ import java.util.*;
 
 public class JSON {
     private JSON() {}
-    public static List<String> toList(JSONArray jsonArray) {
+    public static List<String> aclJSONArrayToList(JSONArray jsonArray) {
         if(jsonArray == null)
             return null;
         List<String> list = new LinkedList<String>();
         for(int i=0;i<jsonArray.length();i++) {
-            list.add(jsonArray.getString(i));
+            JSONObject aclObject = jsonArray.getJSONObject(i);
+            if(aclObject != null) {
+                list.add(aclObject.getString("entityId"));
+            }
         }
         return list;
     }

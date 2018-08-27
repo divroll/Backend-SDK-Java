@@ -71,10 +71,14 @@ public class DivrollUser extends DivrollBase {
             JSONArray aclWrite = new JSONArray();
             if(this.acl != null) {
                 for(String uuid : this.acl.getAclRead()) {
-                    aclRead.put(uuid);
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
                 }
                 for(String uuid : this.acl.getAclWrite()) {
-                    aclWrite.put(uuid);
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
                 }
             }
 
@@ -92,6 +96,8 @@ public class DivrollUser extends DivrollBase {
                 throwException(response);
             } else if(response.getStatus() == 401) {
                 throw new UnauthorizedException(response.getStatusText());
+            } else if(response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
             } else if(response.getStatus() == 201) {
                 JsonNode responseBody = response.getBody();
                 JSONObject bodyObj = responseBody.getObject();
@@ -120,27 +126,26 @@ public class DivrollUser extends DivrollBase {
                 }
 
                 try {
-                    aclWriteList = JSON.toList(responseUser.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(responseUser.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(responseUser.getJSONArray("aclRead"));
+                    aclReadList = JSON.aclJSONArrayToList(responseUser.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    String singleAclWrite = responseUser.getString("aclWrite");
-                    aclWriteList = Arrays.asList(singleAclWrite);
+                    JSONObject jsonObject = responseUser.getJSONObject("aclWrite");
+                    aclWriteList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
-
                 try {
-                    String singleAclRead = responseUser.getString("aclRead");
-                    aclReadList = Arrays.asList(singleAclRead);
+                    JSONObject jsonObject = responseUser.getJSONObject("aclRead");
+                    aclReadList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
@@ -236,13 +241,13 @@ public class DivrollUser extends DivrollBase {
                 List<String> aclReadList = null;
 
                 try {
-                    aclWriteList = JSON.toList(userJsonObj.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(userJsonObj.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(userJsonObj.getJSONArray("aclRead"));
+                    aclReadList = JSON.aclJSONArrayToList(userJsonObj.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
@@ -318,6 +323,25 @@ public class DivrollUser extends DivrollBase {
                 httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
             JSONObject userObj = new JSONObject();
+
+            JSONArray aclRead = new JSONArray();
+            JSONArray aclWrite = new JSONArray();
+            if(acl != null) {
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
+                }
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
+                }
+            }
+
+            userObj.put("aclRead", aclRead);
+            userObj.put("aclWrite", aclWrite);
+
             if(username != null) {
                 userObj.put("username", newUsername);
             }
@@ -340,16 +364,7 @@ public class DivrollUser extends DivrollBase {
 
             body.put("user", userObj);
 
-            JSONArray aclRead = new JSONArray();
-            JSONArray aclWrite = new JSONArray();
-            if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
-                }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
-                }
-            }
+
 
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
@@ -406,25 +421,26 @@ public class DivrollUser extends DivrollBase {
                 List<String> aclReadList = null;
 
                 try {
-                    aclWriteList = JSON.toList(responseUser.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(responseUser.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(responseUser.getJSONArray("aclRead"));
+                    aclReadList = JSON.aclJSONArrayToList(responseUser.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = Arrays.asList(responseUser.getString("aclWrite"));
+                    JSONObject jsonObject = responseUser.getJSONObject("aclWrite");
+                    aclWriteList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
-
                 try {
-                    aclReadList = Arrays.asList(responseUser.getString("aclRead"));
+                    JSONObject jsonObject = responseUser.getJSONObject("aclRead");
+                    aclReadList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }

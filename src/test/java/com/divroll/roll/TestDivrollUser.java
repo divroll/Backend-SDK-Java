@@ -33,7 +33,7 @@ public class TestDivrollUser extends TestCase {
         user.retrieve();
     }
 
-    @Test//(expected = InvalidEntityException.class)
+    @Test(expected =  BadRequestException.class)
     public void testCreateUserInvalidACLShouldThrowException() {
         TestApplication application = TestData.getNewApplication();
         Divroll.initialize(application.getAppId(), application.getApiToken());
@@ -45,7 +45,7 @@ public class TestDivrollUser extends TestCase {
         user.setAcl(acl);
         user.create("username", "password");
 
-        Assert.assertNotNull(user.getEntityId());
+        //Assert.assertNotNull(user.getEntityId());
     }
 
     @Test

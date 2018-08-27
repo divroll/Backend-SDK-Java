@@ -98,13 +98,13 @@ public class DivrollRoles extends DivrollBase {
                     List<String> aclReadList = null;
 
                     try {
-                        aclWriteList = JSON.toList(roleObj.getJSONArray("aclWrite"));
+                        aclWriteList = JSON.aclJSONArrayToList(roleObj.getJSONArray("aclWrite"));
                     } catch (Exception e) {
 
                     }
 
                     try {
-                        aclReadList = JSON.toList(roleObj.getJSONArray("aclRead"));
+                        aclReadList = JSON.aclJSONArrayToList(roleObj.getJSONArray("aclRead"));
                     } catch (Exception e) {
 
                     }

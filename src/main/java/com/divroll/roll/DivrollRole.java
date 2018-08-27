@@ -57,11 +57,15 @@ public class DivrollRole extends DivrollBase {
             JSONArray aclRead = new JSONArray();
             JSONArray aclWrite = new JSONArray();
             if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
                 }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
                 }
             }
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
@@ -109,25 +113,26 @@ public class DivrollRole extends DivrollBase {
                 List<String> aclReadList = null;
 
                 try {
-                    aclWriteList = JSON.toList(role.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(role.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = Arrays.asList(role.getString("aclWrite"));
+                    aclReadList = JSON.aclJSONArrayToList(role.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(role.getJSONArray("aclRead"));
+                    JSONObject jsonObject = role.getJSONObject("aclWrite");
+                    aclWriteList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
-
                 try {
-                    aclReadList = Arrays.asList(role.getString("aclRead"));
+                    JSONObject jsonObject = role.getJSONObject("aclRead");
+                    aclReadList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
@@ -157,8 +162,24 @@ public class DivrollRole extends DivrollBase {
             }
 
             JSONObject roleObj = new JSONObject();
-            roleObj.put("name", name);
 
+            JSONArray aclRead = new JSONArray();
+            JSONArray aclWrite = new JSONArray();
+            if(acl != null) {
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
+                }
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
+                }
+            }
+            roleObj.put("aclRead", aclRead);
+            roleObj.put("aclWrite", aclWrite);
+            roleObj.put("name", name);
             roleObj.put("publicRead", (acl != null && acl.getPublicRead() != null)
                     ? acl.getPublicRead() : JSONObject.NULL);
             roleObj.put("publicWrite", (acl != null && acl.getPublicWrite() != null)
@@ -166,16 +187,7 @@ public class DivrollRole extends DivrollBase {
             JSONObject body = new JSONObject();
             body.put("role", roleObj);
 
-            JSONArray aclRead = new JSONArray();
-            JSONArray aclWrite = new JSONArray();
-            if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
-                }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
-                }
-            }
+
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
@@ -206,25 +218,26 @@ public class DivrollRole extends DivrollBase {
                 List<String> aclReadList = null;
 
                 try {
-                    aclWriteList = JSON.toList(role.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(role.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(role.getJSONArray("aclRead"));
+                    aclReadList = JSON.aclJSONArrayToList(role.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = Arrays.asList(role.getString("aclWrite"));
+                    JSONObject jsonObject = role.getJSONObject("aclWrite");
+                    aclWriteList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
-
                 try {
-                    aclReadList = Arrays.asList(role.getString("aclRead"));
+                    JSONObject jsonObject = role.getJSONObject("aclRead");
+                    aclReadList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
@@ -319,25 +332,26 @@ public class DivrollRole extends DivrollBase {
                 List<String> aclReadList = null;
 
                 try {
-                    aclWriteList = JSON.toList(role.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(role.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(role.getJSONArray("aclRead"));
+                    aclReadList = JSON.aclJSONArrayToList(role.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = Arrays.asList(role.getString("aclWrite"));
+                    JSONObject jsonObject = role.getJSONObject("aclWrite");
+                    aclWriteList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
-
                 try {
-                    aclReadList = Arrays.asList(role.getString("aclRead"));
+                    JSONObject jsonObject = role.getJSONObject("aclRead");
+                    aclReadList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }

@@ -97,11 +97,15 @@ public class DivrollEntity extends DivrollBase {
             JSONArray aclRead = new JSONArray();
             JSONArray aclWrite = new JSONArray();
             if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
                 }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
                 }
             }
 
@@ -255,7 +259,7 @@ public class DivrollEntity extends DivrollBase {
                             }
                         } else if(propertyKey.equals("aclRead")) {
                             try {
-                                List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclRead"));
+                                List<String> value = JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclRead"));
                                 divrollEntity.getAcl().setAclRead(value);
                             } catch (Exception e) {
 
@@ -268,7 +272,7 @@ public class DivrollEntity extends DivrollBase {
                             }
                         } else if(propertyKey.equals("aclWrite")) {
                             try {
-                                List<String> value = JSON.toList(entityJSONObject.getJSONArray("aclWrite"));
+                                List<String> value = JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclWrite"));
                                 divrollEntity.getAcl().setAclWrite(value);
                             } catch (Exception e) {
 
@@ -355,13 +359,13 @@ public class DivrollEntity extends DivrollBase {
                 List<String> aclReadList = null;
 
                 try {
-                    aclWriteList = JSON.toList(entityJsonObject.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(entityJsonObject.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(entityJsonObject.getJSONArray("aclRead"));
+                    aclReadList = JSON.aclJSONArrayToList(entityJsonObject.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
@@ -430,11 +434,15 @@ public class DivrollEntity extends DivrollBase {
             JSONArray aclRead = new JSONArray();
             JSONArray aclWrite = new JSONArray();
             if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
                 }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
                 }
             }
 
@@ -483,11 +491,15 @@ public class DivrollEntity extends DivrollBase {
             JSONArray aclRead = new JSONArray();
             JSONArray aclWrite = new JSONArray();
             if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
                 }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
                 }
             }
 
@@ -536,11 +548,15 @@ public class DivrollEntity extends DivrollBase {
             JSONArray aclRead = new JSONArray();
             JSONArray aclWrite = new JSONArray();
             if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
                 }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
                 }
             }
 
@@ -597,11 +613,24 @@ public class DivrollEntity extends DivrollBase {
             if(Divroll.getAuthToken() != null) {
                 httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
-            JSONArray aclReadArray = new JSONArray();
-            JSONArray aclWriteArray = new JSONArray();
 
-            entityObj.put("aclRead", aclReadArray);
-            entityObj.put("aclWrite", aclWriteArray);
+            JSONArray aclRead = new JSONArray();
+            JSONArray aclWrite = new JSONArray();
+            if(acl != null) {
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
+                }
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
+                }
+            }
+
+            entityObj.put("aclRead", aclRead);
+            entityObj.put("aclWrite", aclWrite);
             entityObj.put("publicRead", (this.acl != null && this.acl.getPublicRead() != null)
                     ? this.acl.getPublicRead() : JSONObject.NULL);
             entityObj.put("publicWrite", (this.acl != null && this.acl.getPublicWrite() != null)
@@ -609,25 +638,16 @@ public class DivrollEntity extends DivrollBase {
             JSONObject body = new JSONObject();
             body.put("entity", entityObj);
 
-            JSONArray aclRead = new JSONArray();
-            JSONArray aclWrite = new JSONArray();
-            if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
-                }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
-                }
-            }
+
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println("REQUEST: " + body.toString());
+            System.out.println("CREATE REQUEST: " + body.toString());
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
 
-            System.out.println("RESPONSE: " + response.getBody().toString());
+            System.out.println("CREATE RESPONSE: " + response.getBody().toString());
 
             if(response.getStatus() >= 500) {
                 throw new DivrollException(response.getStatusText());
@@ -663,11 +683,23 @@ public class DivrollEntity extends DivrollBase {
             if(Divroll.getAuthToken() != null) {
                 httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
             }
-            JSONArray aclReadArray = new JSONArray();
-            JSONArray aclWriteArray = new JSONArray();
+            JSONArray aclRead = new JSONArray();
+            JSONArray aclWrite = new JSONArray();
+            if(acl != null) {
+                for(String uuid : this.acl.getAclRead()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclRead.put(entityStub);
+                }
+                for(String uuid : this.acl.getAclWrite()) {
+                    JSONObject entityStub = new JSONObject();
+                    entityStub.put("entityId", uuid);
+                    aclWrite.put(entityStub);
+                }
+            }
 
-            entityObj.put("aclRead", aclReadArray);
-            entityObj.put("aclWrite", aclWriteArray);
+            entityObj.put("aclRead", aclRead);
+            entityObj.put("aclWrite", aclWrite);
             entityObj.put("publicRead", (this.acl != null && this.acl.getPublicRead() != null)
                     ? this.acl.getPublicRead() : JSONObject.NULL);
             entityObj.put("publicWrite", (this.acl != null && this.acl.getPublicWrite() != null)
@@ -676,25 +708,16 @@ public class DivrollEntity extends DivrollBase {
             JSONObject body = new JSONObject();
             body.put("entity", entityObj);
 
-            JSONArray aclRead = new JSONArray();
-            JSONArray aclWrite = new JSONArray();
-            if(acl != null) {
-                for(String uuid : acl.getAclRead()) {
-                    aclRead.put(uuid);
-                }
-                for(String uuid : acl.getAclWrite()) {
-                    aclWrite.put(uuid);
-                }
-            }
+
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println("REQUEST: " + body.toString());
+            System.out.println("UPDATE REQUEST: " + body.toString());
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
 
-            System.out.println("RESPONSE: " + response.getBody().toString());
+            System.out.println("UPDATE RESPONSE: " + response.getBody().toString());
 
             if(response.getStatus() >= 500) {
                 throw new DivrollException(response.getStatusText());
@@ -770,25 +793,26 @@ public class DivrollEntity extends DivrollBase {
                 List<String> aclReadList = null;
 
                 try {
-                    aclWriteList = JSON.toList(entityJsonObject.getJSONArray("aclWrite"));
+                    aclWriteList = JSON.aclJSONArrayToList(entityJsonObject.getJSONArray("aclWrite"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclReadList = JSON.toList(entityJsonObject.getJSONArray("aclRead"));
+                    aclReadList = JSON.aclJSONArrayToList(entityJsonObject.getJSONArray("aclRead"));
                 } catch (Exception e) {
 
                 }
 
                 try {
-                    aclWriteList = Arrays.asList(entityJsonObject.getString("aclWrite"));
+                    JSONObject jsonObject = entityJsonObject.getJSONObject("aclWrite");
+                    aclWriteList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
-
                 try {
-                    aclReadList = Arrays.asList(entityJsonObject.getString("aclRead"));
+                    JSONObject jsonObject = entityJsonObject.getJSONObject("aclRead");
+                    aclReadList = Arrays.asList(jsonObject.getString("entityId"));
                 } catch (Exception e) {
 
                 }
