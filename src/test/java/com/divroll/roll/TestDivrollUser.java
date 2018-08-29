@@ -189,7 +189,6 @@ public class TestDivrollUser extends TestCase {
         DivrollACL divrollACL = DivrollACL.build();
         divrollACL.setPublicRead(true);
         divrollACL.setAclWrite(Arrays.asList(userId));
-
         divrollRole.setAcl(divrollACL);
         divrollRole.setName("Admin");
         divrollRole.create();
@@ -203,7 +202,7 @@ public class TestDivrollUser extends TestCase {
         Assert.assertNotNull(Divroll.getAuthToken());
 
         divrollRole.retrieve();
-//
+
         Assert.assertNotNull(divrollRole.getEntityId());
         Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
         Assert.assertTrue(divrollRole.getAcl().getPublicRead());

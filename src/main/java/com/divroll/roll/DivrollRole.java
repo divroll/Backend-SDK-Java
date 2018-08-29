@@ -45,8 +45,6 @@ public class DivrollRole extends DivrollBase {
 
             JSONObject roleObj = new JSONObject();
             roleObj.put("name", name);
-            roleObj.put("aclRead", getAcl() != null ? getAcl().getAclRead() : null);
-            roleObj.put("aclWrite", getAcl() != null ? getAcl().getAclWrite() : null);
             roleObj.put("publicRead", (acl != null && acl.getPublicRead() != null)
                     ? acl.getPublicRead() : JSONObject.NULL);
             roleObj.put("publicWrite", (acl != null && acl.getPublicWrite() != null)
@@ -68,6 +66,9 @@ public class DivrollRole extends DivrollBase {
                     aclWrite.put(entityStub);
                 }
             }
+            roleObj.put("aclRead", getAcl() != null ? aclRead : null);
+            roleObj.put("aclWrite", getAcl() != null ? aclWrite : null);
+
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
