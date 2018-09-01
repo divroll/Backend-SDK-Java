@@ -69,7 +69,7 @@ public class DivrollRoles extends DivrollBase {
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
-            System.out.println(response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throwException(response);
@@ -133,7 +133,7 @@ public class DivrollRoles extends DivrollBase {
                     getRoles().add(role);
 
                 }
-                //System.out.println(bodyObj.toString());
+                //
 
             }
         } catch (UnirestException e) {

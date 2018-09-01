@@ -27,7 +27,7 @@ public class TestDivrollUsers extends TestCase {
 
     @Test
     public void testGetUsers() {
-        System.out.println("Running testGetUsers");
+
         TestApplication application = TestData.getNewApplication();
         Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 

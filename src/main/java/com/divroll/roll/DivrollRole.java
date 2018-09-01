@@ -73,7 +73,7 @@ public class DivrollRole extends DivrollBase {
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println("REQUEST: " + body.toString());
+
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
             if(response.getStatus() >= 500) {
@@ -89,7 +89,7 @@ public class DivrollRole extends DivrollBase {
             } else if(response.getStatus() == 201) {
                 JsonNode responseBody = response.getBody();
                 JSONObject bodyObj = responseBody.getObject();
-                System.out.println("RESPONSE: " + bodyObj.toString());
+
 
                 JSONObject role = bodyObj.getJSONObject("role");
                 String entityId = role.getString("entityId");
@@ -193,7 +193,7 @@ public class DivrollRole extends DivrollBase {
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println("REQUEST: " + body.toString());
+
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
             if(response.getStatus() >= 500) {

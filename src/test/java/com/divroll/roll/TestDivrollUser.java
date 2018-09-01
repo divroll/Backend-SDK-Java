@@ -542,7 +542,7 @@ public class TestDivrollUser extends TestCase {
         Assert.assertNotNull(authToken);
         Assert.assertNotNull(Divroll.getAuthToken());
 
-        System.out.println("Updating...");
+
 
         divrollUser.update("new_username", "new_password");
         Assert.assertEquals("new_username", divrollUser.getUsername());

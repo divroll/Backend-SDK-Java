@@ -218,7 +218,7 @@ public class DivrollEntity extends DivrollBase {
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
-            System.out.println(response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throwException(response);
@@ -643,11 +643,11 @@ public class DivrollEntity extends DivrollBase {
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println("CREATE REQUEST: " + body.toString());
+
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
 
-            System.out.println("CREATE RESPONSE: " + response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throw new DivrollException(response.getStatusText());
@@ -713,11 +713,11 @@ public class DivrollEntity extends DivrollBase {
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println("UPDATE REQUEST: " + body.toString());
+
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
 
-            System.out.println("UPDATE RESPONSE: " + response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throw new DivrollException(response.getStatusText());

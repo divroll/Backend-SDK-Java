@@ -53,7 +53,7 @@ public class DivrollUsers extends DivrollBase {
     public void query() {
         try {
             String completeUrl = Divroll.getServerUrl() + usersUrl;
-            System.out.println(completeUrl);
+
             GetRequest getRequest = (GetRequest) Unirest.get(completeUrl);
 
             if(Divroll.getMasterKey() != null) {
@@ -70,7 +70,7 @@ public class DivrollUsers extends DivrollBase {
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
-            System.out.println(response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throwException(response);
@@ -86,7 +86,7 @@ public class DivrollUsers extends DivrollBase {
 
                 JsonNode body = response.getBody();
 
-                System.out.println("HERE: " + body.toString());
+
 
                 JSONObject bodyObj = body.getObject();
                 JSONObject roles = bodyObj.getJSONObject("users");
@@ -186,7 +186,7 @@ public class DivrollUsers extends DivrollBase {
                     getUsers().add(user);
 
                 }
-                //System.out.println(bodyObj.toString());
+                //
 
             }
         } catch (UnirestException e) {

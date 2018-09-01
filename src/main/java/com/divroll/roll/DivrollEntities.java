@@ -78,7 +78,7 @@ public class DivrollEntities extends DivrollBase {
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
-            System.out.println(response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throwException(response);

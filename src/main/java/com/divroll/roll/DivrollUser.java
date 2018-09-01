@@ -82,7 +82,7 @@ public class DivrollUser extends DivrollBase {
                 }
             }
 
-            System.out.println("REQUEST: " + body.toString());
+
 
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
@@ -90,7 +90,7 @@ public class DivrollUser extends DivrollBase {
 
             HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
 
-            System.out.println("RESPONSE: " + response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throwException(response);
@@ -205,7 +205,7 @@ public class DivrollUser extends DivrollBase {
             }
 
             HttpResponse<JsonNode> response = getRequest.asJson();
-            System.out.println(response.getBody().toString());
+
 
             if(response.getStatus() >= 500) {
                 throwException(response);
@@ -308,7 +308,7 @@ public class DivrollUser extends DivrollBase {
         try {
 
             String completeUrl = Divroll.getServerUrl() + usersUrl + "/" + getEntityId();
-            System.out.println(completeUrl);
+
             HttpRequestWithBody httpRequestWithBody = Unirest.put(completeUrl);
             if(Divroll.getMasterKey() != null) {
                 httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
@@ -370,7 +370,7 @@ public class DivrollUser extends DivrollBase {
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-            System.out.println("REQUEST: " + body.toString());
+
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
 
