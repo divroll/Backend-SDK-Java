@@ -2,7 +2,7 @@ package com.divroll.roll;
 
 public class Divroll {
 
-    private static String divrollServerUrl = "http://localhost:8080/roll";
+    private static String divrollServerUrl = "http://localhost:8080/divroll";
     private static String applicationId;
     private static String applicationKey;
     private static String applicationMasterKey;

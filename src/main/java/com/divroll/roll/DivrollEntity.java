@@ -111,7 +111,7 @@ public class DivrollEntity extends DivrollBase {
 
             httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
-            httpRequestWithBody.header("Content-Type", "application/json");
+            httpRequestWithBody.header("Content-Type", "application/octet-stream");
 
             HttpResponse<InputStream> response =  httpRequestWithBody.body(value).asBinary();
             if(response.getStatus() >= 500) {
@@ -643,11 +643,9 @@ public class DivrollEntity extends DivrollBase {
             httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
             httpRequestWithBody.header("Content-Type", "application/json");
 
-
+            System.out.println("BODY - " + body.toString());
 
             HttpResponse<JsonNode> response =  httpRequestWithBody.body(body).asJson();
-
-
 
             if(response.getStatus() >= 500) {
                 throw new DivrollException(response.getStatusText());

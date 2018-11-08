@@ -845,8 +845,8 @@ public class TestDivrollEntity extends TestCase {
             e.printStackTrace();
         }
 
-        Assert.assertNotNull(userProfile.getProperty("links"));
-        Assert.assertTrue(((List)userProfile.getProperty("links")).contains("user"));
+        Assert.assertNotNull(userProfile.getProperty("linkNames"));
+        Assert.assertTrue(((List)userProfile.getProperty("linkNames")).contains("user"));
 
         List<DivrollEntity> entities = userProfile.links("user");
         Assert.assertNotNull(entities);
@@ -861,8 +861,8 @@ public class TestDivrollEntity extends TestCase {
         userProfile.removeLink("user", adminUser.getEntityId());
         userProfile.retrieve();
 //
-        Assert.assertNotNull(userProfile.getProperty("links"));
-        Assert.assertFalse(((List)userProfile.getProperty("links")).contains("user"));
+        Assert.assertNotNull(userProfile.getProperty("linkNames"));
+        Assert.assertFalse(((List)userProfile.getProperty("linkNames")).contains("user"));
 
         userProfile.delete();
     }
