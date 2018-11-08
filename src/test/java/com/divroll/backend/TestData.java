@@ -1,10 +1,9 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.fluttercode.datafactory.impl.DataFactory;
 import org.json.JSONObject;

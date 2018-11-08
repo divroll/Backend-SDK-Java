@@ -4,15 +4,15 @@
 
   <!--<parent>-->
     <!--<groupId>com.divroll.divrollroupId>-->
-    <!--<artifactId>roll-parent</artifactId>-->
+    <!--<artifactId>backend-parent</artifactId>-->
     <!--<version>0-SNAPSHOT</version>-->
   <!--</parent>-->
 
-  <groupId>com.divroll</groupId>
-  <artifactId>roll-sdk-java</artifactId>
+  <groupId>com.divroll.backend</groupId>
+  <artifactId>backend-sdk-java</artifactId>
   <version>0-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>Roll-SDK-Java</name>
+  <name>Backend-SDK-Java</name>
   <url>http://maven.apache.org</url>
 
   <properties>

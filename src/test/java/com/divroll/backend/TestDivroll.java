@@ -1,4 +1,4 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
 /**
  *

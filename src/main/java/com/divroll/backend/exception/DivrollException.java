@@ -1,4 +1,4 @@
-package com.divroll.roll.exception;
+package com.divroll.backend.exception;
 
 public class DivrollException extends RuntimeException {
     public DivrollException(String mesage) {

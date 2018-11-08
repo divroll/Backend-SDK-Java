@@ -1,7 +1,8 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
-import com.divroll.roll.exception.BadRequestException;
-import com.divroll.roll.exception.UnauthorizedException;
+import com.divroll.backend.exception.BadRequestException;
+import com.divroll.backend.exception.NotFoundRequestException;
+import com.divroll.backend.exception.UnauthorizedException;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -648,6 +649,8 @@ public class TestDivrollUser extends TestCase {
         Assert.assertNotNull(Divroll.getAuthToken());
 
         divrollUser.delete();
+
+        adminUser.logout();
     }
 
     @Test(expected = UnauthorizedException.class)

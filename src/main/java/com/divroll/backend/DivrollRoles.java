@@ -1,8 +1,8 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
-import com.divroll.roll.exception.BadRequestException;
-import com.divroll.roll.exception.UnauthorizedException;
-import com.divroll.roll.helper.JSON;
+import com.divroll.backend.exception.BadRequestException;
+import com.divroll.backend.exception.UnauthorizedException;
+import com.divroll.backend.helper.JSON;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;

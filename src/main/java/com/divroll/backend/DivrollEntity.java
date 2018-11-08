@@ -1,10 +1,10 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
-import com.divroll.roll.exception.BadRequestException;
-import com.divroll.roll.exception.DivrollException;
-import com.divroll.roll.exception.NotFoundRequestException;
-import com.divroll.roll.exception.UnauthorizedException;
-import com.divroll.roll.helper.JSON;
+import com.divroll.backend.exception.BadRequestException;
+import com.divroll.backend.exception.DivrollException;
+import com.divroll.backend.exception.NotFoundRequestException;
+import com.divroll.backend.exception.UnauthorizedException;
+import com.divroll.backend.helper.JSON;
 import com.google.common.io.ByteStreams;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;

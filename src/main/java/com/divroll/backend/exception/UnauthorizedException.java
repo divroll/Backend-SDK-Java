@@ -1,4 +1,4 @@
-package com.divroll.roll.exception;
+package com.divroll.backend.exception;
 
 public class UnauthorizedException extends DivrollException {
     public UnauthorizedException(String mesage) {

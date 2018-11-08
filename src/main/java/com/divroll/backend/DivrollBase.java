@@ -1,6 +1,6 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
-import com.divroll.roll.exception.DivrollException;
+import com.divroll.backend.exception.DivrollException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import org.json.JSONObject;

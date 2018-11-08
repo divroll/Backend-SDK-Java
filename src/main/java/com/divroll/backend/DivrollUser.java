@@ -1,9 +1,10 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
-import com.divroll.roll.exception.BadRequestException;
-import com.divroll.roll.exception.DivrollException;
-import com.divroll.roll.exception.UnauthorizedException;
-import com.divroll.roll.helper.JSON;
+import com.divroll.backend.exception.BadRequestException;
+import com.divroll.backend.exception.DivrollException;
+import com.divroll.backend.exception.NotFoundRequestException;
+import com.divroll.backend.exception.UnauthorizedException;
+import com.divroll.backend.helper.JSON;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -209,6 +210,8 @@ public class DivrollUser extends DivrollBase {
 
             if(response.getStatus() >= 500) {
                 throwException(response);
+            } else if(response.getStatus() == 404) {
+                throw new NotFoundRequestException(response.getStatusText());
             } else if(response.getStatus() == 401) {
                 throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() == 400) {
@@ -511,7 +514,7 @@ public class DivrollUser extends DivrollBase {
             } else if(response.getStatus() == 401) {
                 throw new UnauthorizedException(response.getStatusText());
             } else if(response.getStatus() >= 400) {
-                throwException(response);
+                throw new BadRequestException(response.getStatusText());
             } else if(response.getStatus() == 204) {
                 setEntityId(null);
                 setAcl(null);

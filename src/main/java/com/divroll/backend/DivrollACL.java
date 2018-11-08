@@ -1,4 +1,4 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.divroll.roll;
+package com.divroll.backend;
 
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
