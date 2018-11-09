@@ -1,57 +1,57 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <!--<parent>-->
+    <!--<parent>-->
     <!--<groupId>com.divroll.divrollroupId>-->
     <!--<artifactId>backend-parent</artifactId>-->
     <!--<version>0-SNAPSHOT</version>-->
-  <!--</parent>-->
+    <!--</parent>-->
 
-  <groupId>com.divroll.backend</groupId>
-  <artifactId>backend-sdk-java</artifactId>
-  <version>0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>Backend-SDK-Java</name>
-  <url>http://maven.apache.org</url>
+    <groupId>com.divroll.backend</groupId>
+    <artifactId>backend-sdk-java</artifactId>
+    <version>0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Backend-SDK-Java</name>
+    <url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.fluttercode.datafactory</groupId>
-      <artifactId>datafactory</artifactId>
-      <version>0.8</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.5.3</version>
-    </dependency>
-    <dependency>
-      <groupId>com.mashape.unirest</groupId>
-      <artifactId>unirest-java</artifactId>
-      <version>1.4.9</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>18.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-  </dependencies>
-  
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fluttercode.datafactory</groupId>
+            <artifactId>datafactory</artifactId>
+            <version>0.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>1.4.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+    </dependencies>
+
 </project>
