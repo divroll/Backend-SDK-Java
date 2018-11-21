@@ -2,6 +2,7 @@ package com.divroll.backend;
 
 import com.divroll.backend.exception.BadRequestException;
 import com.divroll.backend.exception.UnauthorizedException;
+import com.divroll.backend.filter.QueryFilter;
 import com.divroll.backend.helper.JSON;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class DivrollEntities extends DivrollBase {
 
-  private static String entityStoreUrl = "/entities/";
+  private String entityStoreUrl = "/entities/";
 
   private List<DivrollEntity> entities;
   private int skip;
@@ -59,7 +60,7 @@ public class DivrollEntities extends DivrollBase {
     this.limit = limit;
   }
 
-  public void query() {
+  public void query(QueryFilter filter) {
     try {
       GetRequest getRequest = (GetRequest) Unirest.get(Divroll.getServerUrl() + entityStoreUrl);
 
@@ -74,6 +75,10 @@ public class DivrollEntities extends DivrollBase {
       }
       if (Divroll.getAuthToken() != null) {
         getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
+      }
+
+      if(filter != null) {
+        getRequest.queryString("queries", filter.toString());
       }
 
       HttpResponse<JsonNode> response = getRequest.asJson();
@@ -155,4 +160,9 @@ public class DivrollEntities extends DivrollBase {
       e.printStackTrace();
     }
   }
+
+  public void query() {
+    query(null);
+  }
+
 }
