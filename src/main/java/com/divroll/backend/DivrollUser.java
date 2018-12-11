@@ -11,6 +11,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import com.sun.org.apache.xpath.internal.operations.Div;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,6 +49,9 @@ public class DivrollUser extends DivrollBase {
       }
       if (Divroll.getAuthToken() != null) {
         httpRequestWithBody.header("X-Divroll-Auth-Key", Divroll.getAuthToken());
+      }
+      if (Divroll.getNameSpace() != null) {
+        httpRequestWithBody.header(HEADER_NAMESPACE, Divroll.getNameSpace());
       }
       JSONObject userObj = new JSONObject();
       userObj.put("username", username);
@@ -210,7 +214,9 @@ public class DivrollUser extends DivrollBase {
       if (Divroll.getAuthToken() != null) {
         getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
       }
-
+      if (Divroll.getNameSpace() != null) {
+        getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       HttpResponse<JsonNode> response = getRequest.asJson();
 
       if (response.getStatus() >= 500) {
@@ -330,6 +336,9 @@ public class DivrollUser extends DivrollBase {
       }
       if (Divroll.getAuthToken() != null) {
         httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
+      }
+      if (Divroll.getNameSpace() != null) {
+        httpRequestWithBody.header(HEADER_NAMESPACE, Divroll.getNameSpace());
       }
       JSONObject userObj = new JSONObject();
 
@@ -512,6 +521,9 @@ public class DivrollUser extends DivrollBase {
       if (Divroll.getAuthToken() != null) {
         httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
       }
+      if (Divroll.getNameSpace() != null) {
+        httpRequestWithBody.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
       if (response.getStatus() >= 500) {
         throwException(response);
@@ -553,6 +565,10 @@ public class DivrollUser extends DivrollBase {
       if (Divroll.getApiKey() != null) {
         getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
       }
+      if (Divroll.getNameSpace() != null) {
+        getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
+
       HttpResponse<JsonNode> response = getRequest.asJson();
       if (response.getStatus() == 404) {
 

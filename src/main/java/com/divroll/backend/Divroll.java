@@ -7,6 +7,7 @@ public class Divroll {
   private static String applicationKey;
   private static String applicationMasterKey;
   private static String authenticationToken;
+  private static String divrollNameSpace;
 
   private Divroll() {}
 
@@ -51,4 +52,13 @@ public class Divroll {
   public static void setAuthToken(String authToken) {
     authenticationToken = authToken;
   }
+
+  public static void setNamespace(String nameSpace) {
+    divrollNameSpace = nameSpace;
+  }
+
+  public static String getNameSpace() {
+    return divrollNameSpace;
+  }
+
 }

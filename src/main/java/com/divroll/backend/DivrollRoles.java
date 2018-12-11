@@ -66,7 +66,9 @@ public class DivrollRoles extends DivrollBase {
       if (Divroll.getAuthToken() != null) {
         getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
       }
-
+      if (Divroll.getNameSpace() != null) {
+        getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       HttpResponse<JsonNode> response = getRequest.asJson();
 
       if (response.getStatus() >= 500) {

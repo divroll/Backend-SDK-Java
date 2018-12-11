@@ -76,7 +76,9 @@ public class DivrollEntities extends DivrollBase {
       if (Divroll.getAuthToken() != null) {
         getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
       }
-
+      if (Divroll.getNameSpace() != null) {
+        getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       if(filter != null) {
         getRequest.queryString("queries", filter.toString());
       }

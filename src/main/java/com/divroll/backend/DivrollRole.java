@@ -42,7 +42,9 @@ public class DivrollRole extends DivrollBase {
       if (Divroll.getApiKey() != null) {
         httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
       }
-
+      if (Divroll.getNameSpace() != null) {
+        httpRequestWithBody.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       JSONObject roleObj = new JSONObject();
       roleObj.put("name", name);
       roleObj.put(
@@ -162,7 +164,9 @@ public class DivrollRole extends DivrollBase {
       if (Divroll.getApiKey() != null) {
         httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
       }
-
+      if (Divroll.getNameSpace() != null) {
+        httpRequestWithBody.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       JSONObject roleObj = new JSONObject();
 
       JSONArray aclRead = new JSONArray();
@@ -271,6 +275,9 @@ public class DivrollRole extends DivrollBase {
       if (Divroll.getAuthToken() != null) {
         httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getApiKey());
       }
+      if (Divroll.getNameSpace() != null) {
+        httpRequestWithBody.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
       if (response.getStatus() >= 500) {
         throwException(response);
@@ -307,7 +314,9 @@ public class DivrollRole extends DivrollBase {
       if (Divroll.getAuthToken() != null) {
         getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
       }
-
+      if (Divroll.getNameSpace() != null) {
+        getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
       HttpResponse<JsonNode> response = getRequest.asJson();
 
       if (response.getStatus() >= 500) {
