@@ -694,4 +694,33 @@ public class TestDivrollUser extends TestCase {
 
     divrollUser.delete();
   }
+
+  @Test
+  public void testCreateUserThenLogin() {
+    TestApplication application = TestData.getNewApplication();
+    Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+    Divroll.setNamespace("test-namespace");
+    DivrollUser testUser = new DivrollUser();
+    testUser.setAcl(DivrollACL.buildMasterKeyOnly());
+    testUser.create("user", "password");
+    System.out.println(testUser.getEntityId());
+    Divroll.setNamespace(null);
+
+    DivrollUser loginUser = new DivrollUser();
+    loginUser.login("user", "password");
+    String authToken = loginUser.getAuthToken();
+    assertNull(authToken);
+
+    Divroll.setNamespace("wrong-namespace");
+    loginUser.login("user", "password");
+    authToken = loginUser.getAuthToken();
+    assertNull(authToken);
+
+    Divroll.setNamespace("test-namespace");
+    loginUser.login("user", "password");
+    authToken = loginUser.getAuthToken();
+    assertNotNull(authToken);
+
+  }
+
 }
