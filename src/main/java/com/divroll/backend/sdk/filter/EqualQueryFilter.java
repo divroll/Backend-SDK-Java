@@ -19,10 +19,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.divroll.backend.exception;
+package com.divroll.backend.sdk.filter;
 
-public class BadRequestException extends DivrollException {
-  public BadRequestException(String mesage) {
-    super(mesage);
-  }
+import org.json.JSONObject;
+
+public class EqualQueryFilter implements QueryFilter {
+    private JSONObject filter = new JSONObject();
+    private EqualQueryFilter() {}
+    public EqualQueryFilter(String propertyName, String propertyValue) {
+        JSONObject opFind = new JSONObject();
+        opFind.put(propertyName, propertyValue);
+        filter.put("$find", opFind);
+    }
+    public EqualQueryFilter(String propertyName, Double propertyValue) {
+        JSONObject opFind = new JSONObject();
+        opFind.put(propertyName, propertyValue);
+        filter.put("$find", opFind);
+    }
+    public EqualQueryFilter(String propertyName, Boolean propertyValue) {
+        JSONObject opFind = new JSONObject();
+        opFind.put(propertyName, propertyValue);
+        filter.put("$find", opFind);
+    }
+    @Override
+    public String toString() {
+        return filter.toString();
+    }
 }

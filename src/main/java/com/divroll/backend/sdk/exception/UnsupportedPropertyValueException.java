@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.divroll.backend.exception;
+package com.divroll.backend.sdk.exception;
 
 public class UnsupportedPropertyValueException extends DivrollException {
   public UnsupportedPropertyValueException(String mesage) {

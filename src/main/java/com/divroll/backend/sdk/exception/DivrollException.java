@@ -19,8 +19,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.divroll.backend.filter;
+package com.divroll.backend.sdk.exception;
 
-public interface QueryFilter {
-    String toString();
+public class DivrollException extends RuntimeException {
+  public DivrollException(String mesage) {
+    super(mesage);
+  }
 }

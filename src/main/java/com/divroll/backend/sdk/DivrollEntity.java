@@ -19,13 +19,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.divroll.backend;
+package com.divroll.backend.sdk;
 
-import com.divroll.backend.exception.BadRequestException;
-import com.divroll.backend.exception.DivrollException;
-import com.divroll.backend.exception.NotFoundRequestException;
-import com.divroll.backend.exception.UnauthorizedException;
-import com.divroll.backend.helper.JSON;
+import com.divroll.backend.sdk.exception.BadRequestException;
+import com.divroll.backend.sdk.exception.DivrollException;
+import com.divroll.backend.sdk.exception.NotFoundRequestException;
+import com.divroll.backend.sdk.exception.UnauthorizedException;
+import com.divroll.backend.sdk.helper.JSON;
 import com.google.common.io.ByteStreams;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;

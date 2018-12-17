@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.divroll.backend;
+package com.divroll.backend.sdk;
 
 import junit.framework.TestCase;
 import org.fluttercode.datafactory.impl.DataFactory;
@@ -33,38 +33,58 @@ import org.junit.runners.JUnit4;
 import java.util.Arrays;
 
 @RunWith(JUnit4.class)
-public class TestDivrollRoles extends TestCase {
+public class TestDivrollUsers extends TestCase {
   @Rule public final ExpectedException exception = ExpectedException.none();
 
   @Test
-  public void testListRolesUsingMasterKey() {
+  public void testGetApplication() {
+    TestApplication application = TestData.getNewApplication();
+    Divroll.initialize(
+        application.getAppId(), application.getApiToken(), application.getMasterKey());
+    Assert.assertNotNull(application.getApiToken());
+    Assert.assertNotNull(application.getAppId());
+    Assert.assertNotNull(application.getMasterKey());
+  }
+
+  @Test
+  public void testGetUsers() {
+
     TestApplication application = TestData.getNewApplication();
     Divroll.initialize(
         application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-    DivrollRole adminRole = new DivrollRole();
-    adminRole.setName("Admin");
-    adminRole.create();
+    DataFactory df = new DataFactory();
+    for (int i = 0; i < 100; i++) {
+      DivrollUser divrollUser = new DivrollUser();
+      divrollUser.create(df.getEmailAddress(), "password");
+    }
 
-    DivrollRole userRole = new DivrollRole();
-    userRole.setName("User");
-    userRole.create();
+    DivrollUsers users = new DivrollUsers();
+    users.query();
 
-    DivrollRole managerRole = new DivrollRole();
-    managerRole.setName("Manager");
-    managerRole.create();
-
-    DivrollRoles divrollRoles = new DivrollRoles();
-    divrollRoles.query();
-
-    assertEquals(3, divrollRoles.getRoles().size());
-    assertEquals("Admin", divrollRoles.getRoles().get(0).getName());
-    assertEquals("User", divrollRoles.getRoles().get(1).getName());
-    assertEquals("Manager", divrollRoles.getRoles().get(2).getName());
+    Assert.assertEquals(100, users.getUsers().size());
   }
 
   @Test
-  public void testGetPublicRoles() {
+  public void testGetUsersMasterKeyOnly() {
+    TestApplication application = TestData.getNewApplication();
+    Divroll.initialize(application.getAppId(), application.getApiToken());
+
+    DataFactory df = new DataFactory();
+    for (int i = 0; i < 100; i++) {
+      DivrollUser divrollUser = new DivrollUser();
+      divrollUser.setAcl(DivrollACL.buildMasterKeyOnly());
+      divrollUser.create(df.getEmailAddress(), "password");
+    }
+
+    DivrollUsers users = new DivrollUsers();
+    users.query();
+
+    Assert.assertEquals(0, users.getUsers().size());
+  }
+
+  @Test
+  public void testGetUsersWithACLUsingAuthToken() {
     TestApplication application = TestData.getNewApplication();
     Divroll.initialize(application.getAppId(), application.getApiToken());
 
@@ -77,72 +97,56 @@ public class TestDivrollRoles extends TestCase {
 
     int size = 10;
     for (int i = 0; i < size; i++) {
-      DivrollRole role = new DivrollRole();
-      role.setName(df.getRandomWord());
-      DivrollACL acl = new DivrollACL();
-      acl.setPublicWrite(false);
-      acl.setPublicRead(true);
-      acl.setAclWrite(Arrays.asList(admin.getEntityId()));
-      role.setAcl(acl);
-      role.create();
-    }
-
-    DivrollRoles roles = new DivrollRoles();
-    roles.query();
-    Assert.assertEquals(10, roles.getRoles().size());
-  }
-
-  @Test
-  public void testGetRolesWithACLUsingAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-
-    DataFactory df = new DataFactory();
-
-    DivrollUser admin = new DivrollUser();
-    admin.setAcl(DivrollACL.buildMasterKeyOnly());
-    String adminUsername = df.getEmailAddress();
-    admin.create(adminUsername, "password");
-
-    for (int i = 0; i < 10; i++) {
-      DivrollRole role = new DivrollRole();
-      role.setName(df.getRandomWord());
-      DivrollACL acl = new DivrollACL();
-      acl.setPublicWrite(false);
-      acl.setPublicRead(true);
-      acl.setAclWrite(Arrays.asList(admin.getEntityId()));
-      role.setAcl(acl);
-      role.create();
-    }
-
-    DivrollRoles roles = new DivrollRoles();
-    roles.query();
-    Assert.assertEquals(10, roles.getRoles().size());
-
-    for (int i = 0; i < 10; i++) {
-      DivrollRole role = new DivrollRole();
-      role.setName(df.getRandomWord());
-      DivrollACL acl = new DivrollACL();
-      acl.setPublicWrite(false);
-      acl.setPublicRead(false);
-      role.setAcl(acl);
-      role.create();
-    }
-
-    for (int i = 0; i < 10; i++) {
-      DivrollRole role = new DivrollRole();
-      role.setName(df.getRandomWord());
+      DivrollUser divrollUser = new DivrollUser();
       DivrollACL acl = new DivrollACL();
       acl.setPublicWrite(false);
       acl.setPublicRead(false);
       acl.setAclRead(Arrays.asList(admin.getEntityId()));
-      role.setAcl(acl);
-      role.create();
+      acl.setAclWrite(Arrays.asList(admin.getEntityId()));
+      divrollUser.setAcl(acl);
+      divrollUser.create(df.getEmailAddress(), "password");
     }
+
+    DivrollUsers users = new DivrollUsers();
+    users.query();
+
+    Assert.assertEquals(0, users.getUsers().size());
 
     admin.login(adminUsername, "password");
 
-    roles.query();
-    Assert.assertEquals(20, roles.getRoles().size());
+    users = new DivrollUsers();
+    users.query();
+
+    Assert.assertEquals(size, users.getUsers().size());
+
+    size = 20;
+    for (int i = 0; i < size; i++) {
+      DivrollUser divrollUser = new DivrollUser();
+      DivrollACL acl = new DivrollACL();
+      acl.setPublicWrite(false);
+      acl.setPublicRead(true);
+      divrollUser.setAcl(acl);
+      divrollUser.create(df.getEmailAddress(), "password");
+    }
+
+    users = new DivrollUsers();
+    users.query();
+
+    Assert.assertEquals(30, users.getUsers().size());
+
+    size = 20;
+    for (int i = 0; i < size; i++) {
+      DivrollUser divrollUser = new DivrollUser();
+      DivrollACL acl = new DivrollACL();
+      acl.setPublicWrite(true);
+      acl.setPublicRead(false);
+      divrollUser.setAcl(acl);
+      divrollUser.create(df.getEmailAddress(), "password");
+    }
+
+    users = new DivrollUsers();
+    users.query();
+
+    Assert.assertEquals(30, users.getUsers().size());
   }
 }
