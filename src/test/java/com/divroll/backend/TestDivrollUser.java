@@ -32,6 +32,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RunWith(JUnit4.class)
 public class TestDivrollUser extends TestCase {
@@ -698,7 +699,7 @@ public class TestDivrollUser extends TestCase {
   @Test
   public void testCreateUserThenLogin() {
     TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+    Divroll.initialize(application.getAppId(), application.getApiToken());
     Divroll.setNamespace("test-namespace");
     DivrollUser testUser = new DivrollUser();
     testUser.setAcl(DivrollACL.buildMasterKeyOnly());
@@ -720,6 +721,57 @@ public class TestDivrollUser extends TestCase {
     loginUser.login("user", "password");
     authToken = loginUser.getAuthToken();
     assertNotNull(authToken);
+  }
+
+  @Test
+  public void testCreateUserWithRoleThenListUserWithGivenRole() {
+    TestApplication application = TestData.getNewApplication();
+    Divroll.initialize(application.getAppId(), application.getApiToken());
+    Divroll.setNamespace("test-namespace");
+
+    DivrollRole adminRole = new DivrollRole("Admin");
+    adminRole.create();
+
+    DivrollRole supervisorRole = new DivrollRole("Supervisor");
+    supervisorRole.create();
+
+    DivrollACL adminACL = new DivrollACL();
+    adminACL.setAclWrite(Arrays.asList(adminRole.getEntityId()));
+    adminACL.setAclRead(Arrays.asList(adminRole.getEntityId()));
+    adminACL.setPublicWrite(false);
+    adminACL.setPublicRead(false);
+
+    DivrollUser admin1 = new DivrollUser();
+    admin1.setRoles(Arrays.asList(adminRole));
+    admin1.setAcl(adminACL);
+    admin1.create("admin1", "password");
+
+    DivrollUser admin2 = new DivrollUser();
+    admin2.setRoles(Arrays.asList(adminRole));
+    admin2.setAcl(adminACL);
+    admin2.create("admin2", "password");
+
+    DivrollUser supervisor1 = new DivrollUser();
+    supervisor1.setRoles(Arrays.asList(supervisorRole));
+    supervisor1.setAcl(adminACL);
+    supervisor1.create("supervisor1", "password");
+
+    admin1.login("admin1", "password");
+    assertNotNull(admin1.getAuthToken());
+
+    DivrollUsers divrollUsers = new DivrollUsers();
+    divrollUsers.query();
+    List<DivrollUser> allUsers = divrollUsers.getUsers();
+
+    System.out.println("AUTH TOKEN - " + admin1.getAuthToken());
+
+    assertEquals(3, allUsers.size());
+
+    DivrollUsers supervisors = new DivrollUsers();
+    supervisors.setRoles(Arrays.asList("Supervisor"));
+    supervisors.query();
+    assertEquals(1, supervisors.getUsers().size());
+
 
   }
 

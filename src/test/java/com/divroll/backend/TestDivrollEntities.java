@@ -145,5 +145,11 @@ public class TestDivrollEntities extends TestCase {
     admin.login(adminUsername, "password");
     entities.query();
     Assert.assertEquals(15, entities.getEntities().size());
+
+    entities.setCount(true);
+    entities.query();
+    Assert.assertEquals(15, entities.getEntities().size());
+    System.out.println("count=" + entities.getResult());
+
   }
 }

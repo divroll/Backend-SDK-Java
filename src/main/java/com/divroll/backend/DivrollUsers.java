@@ -41,8 +41,10 @@ public class DivrollUsers extends DivrollBase {
   private static final String usersUrl = "/entities/users";
 
   private List<DivrollUser> users;
+
   private int skip = 0;
   private int limit = 100;
+  private List<String> roles;
 
   public List<DivrollUser> getUsers() {
     if (users == null) {
@@ -92,6 +94,18 @@ public class DivrollUsers extends DivrollBase {
       if (Divroll.getNameSpace() != null) {
         getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
       }
+
+      final JSONArray rolesArray = new JSONArray();
+      if(roles != null && !roles.isEmpty()) {
+        roles.forEach(role -> {
+            rolesArray.put(role);
+        });
+      }
+
+      if(rolesArray.length() > 0) {
+        getRequest.queryString("roles", rolesArray.toString());
+      }
+
       HttpResponse<JsonNode> response = getRequest.asJson();
 
       if (response.getStatus() >= 500) {
@@ -211,5 +225,9 @@ public class DivrollUsers extends DivrollBase {
     } catch (UnirestException e) {
       e.printStackTrace();
     }
+  }
+
+  public void setRoles(List<String> roles) {
+    this.roles = roles;
   }
 }

@@ -45,6 +45,8 @@ public class DivrollEntities extends DivrollBase {
   private List<DivrollEntity> entities;
   private int skip;
   private int limit;
+  private Boolean count;
+  private Long result;
   private String entityStore;
 
   private DivrollEntities() {}
@@ -104,6 +106,9 @@ public class DivrollEntities extends DivrollBase {
         getRequest.queryString("queries", filter.toString());
       }
 
+      if(count != null) {
+        getRequest.queryString("count", Boolean.valueOf(count));
+      }
       HttpResponse<JsonNode> response = getRequest.asJson();
 
       if (response.getStatus() >= 500) {
@@ -122,6 +127,11 @@ public class DivrollEntities extends DivrollBase {
         JSONObject bodyObj = body.getObject();
         JSONObject entitiesJSONObject = bodyObj.getJSONObject("entities");
         JSONArray results = entitiesJSONObject.getJSONArray("results");
+        try{
+          result = entitiesJSONObject.getLong("count");
+        } catch (Exception e) {
+
+        }
         for (int i = 0; i < results.length(); i++) {
           DivrollEntity divrollEntity = new DivrollEntity(this.entityStore);
           JSONObject entityJSONObject = results.getJSONObject(i);
@@ -188,4 +198,11 @@ public class DivrollEntities extends DivrollBase {
     query(null);
   }
 
+  public void setCount(Boolean count) {
+    this.count = count;
+  }
+
+  public Long getResult() {
+    return result;
+  }
 }
