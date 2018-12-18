@@ -25,6 +25,7 @@ import com.divroll.backend.sdk.exception.BadRequestException;
 import com.divroll.backend.sdk.exception.UnauthorizedException;
 import junit.framework.TestCase;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -771,6 +772,37 @@ public class TestDivrollUser extends TestCase {
     supervisors.setRoles(Arrays.asList("Supervisor"));
     supervisors.query();
     assertEquals(1, supervisors.getUsers().size());
+
+
+  }
+
+  @Test
+  public void testQueryIncludeLinkedEntity() {
+    TestApplication application = TestData.getNewApplication();
+    Divroll.initialize(application.getAppId(), application.getApiToken());
+
+    DivrollUser user = new DivrollUser();
+    user.setAcl(DivrollACL.buildPublicReadWrite());
+    user.create("user", "pass");
+
+    DivrollEntity userProfile = new DivrollEntity("UserProfile");
+    userProfile.setProperty("fullName", "John Smith");
+    userProfile.setAcl(DivrollACL.buildPublicReadWrite());
+    userProfile.create();
+
+    DivrollEntity company = new DivrollEntity("Company");
+    company.setProperty("companyName", "Micro-company");
+    company.setAcl(DivrollACL.buildPublicReadWrite());
+    company.create();
+
+    userProfile.setLink("user", user.getEntityId());
+    user.setLink("userProfile", userProfile.getEntityId());
+    user.setLink("company", company.getEntityId());
+
+    List<DivrollEntity> entities = user.retrieveLinked(Arrays.asList("company", "userProfile"));
+    entities.forEach(divrollEntity -> {
+      System.out.println(divrollEntity.toString());
+    });
 
 
   }

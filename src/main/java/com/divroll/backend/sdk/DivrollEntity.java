@@ -35,6 +35,7 @@ import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +46,7 @@ public class DivrollEntity extends DivrollBase {
   private String entityStoreBase = "/entities/";
   private String entityId;
   private DivrollACL acl;
-  private JSONObject entityObj = new JSONObject();
+  protected JSONObject entityObj = new JSONObject();
 
   private DivrollEntity() {}
 
@@ -454,6 +455,76 @@ public class DivrollEntity extends DivrollBase {
       e.printStackTrace();
     }
     return entities;
+  }
+
+  public void setLink(String linkName, String entityId) {
+    if (entityId == null) {
+      throw new DivrollException("Save the entity first before creating a link");
+    }
+    try {
+      HttpRequestWithBody httpRequestWithBody =
+              Unirest.post(
+                      Divroll.getServerUrl()
+                              + entityStoreBase
+                              + "/"
+                              + getEntityId()
+                              + "/links/"
+                              + linkName
+                              + "/"
+                              + entityId);
+
+      httpRequestWithBody.queryString("linkType", "set");
+
+      if (Divroll.getMasterKey() != null) {
+        httpRequestWithBody.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
+      }
+      if (Divroll.getAppId() != null) {
+        httpRequestWithBody.header(HEADER_APP_ID, Divroll.getAppId());
+      }
+      if (Divroll.getApiKey() != null) {
+        httpRequestWithBody.header(HEADER_API_KEY, Divroll.getApiKey());
+      }
+      if (Divroll.getAuthToken() != null) {
+        httpRequestWithBody.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
+      }
+      if (Divroll.getNameSpace() != null) {
+        httpRequestWithBody.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+      }
+      JSONArray aclRead = new JSONArray();
+      JSONArray aclWrite = new JSONArray();
+      if (acl != null) {
+        for (String uuid : this.acl.getAclRead()) {
+          JSONObject entityStub = new JSONObject();
+          entityStub.put("entityId", uuid);
+          aclRead.put(entityStub);
+        }
+        for (String uuid : this.acl.getAclWrite()) {
+          JSONObject entityStub = new JSONObject();
+          entityStub.put("entityId", uuid);
+          aclWrite.put(entityStub);
+        }
+      }
+
+      httpRequestWithBody.header("X-Divroll-ACL-Read", aclRead.toString());
+      httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
+      httpRequestWithBody.header("Content-Type", "application/json");
+
+      HttpResponse<JsonNode> response = httpRequestWithBody.asJson();
+      if (response.getStatus() >= 500) {
+        throw new DivrollException(response.getStatusText()); // TODO
+      } else if (response.getStatus() == 404) {
+        throw new NotFoundRequestException(response.getStatusText());
+      } else if (response.getStatus() == 401) {
+        throw new UnauthorizedException(response.getStatusText());
+      } else if (response.getStatus() == 400) {
+        throw new BadRequestException(response.getStatusText());
+      } else if (response.getStatus() >= 400) {
+        throw new DivrollException("Client error"); // TODO
+      } else if (response.getStatus() == 201) {
+      }
+    } catch (UnirestException e) {
+      e.printStackTrace();
+    }
   }
 
   public void addLink(String linkName, String entityId) {
@@ -966,4 +1037,10 @@ public class DivrollEntity extends DivrollBase {
     }
     return false;
   }
+
+  public void put(String propertyKey, Object propertyValue) {
+    // TODO - add check for propertyValue
+    entityObj.put(propertyKey, propertyValue);
+  }
+
 }
