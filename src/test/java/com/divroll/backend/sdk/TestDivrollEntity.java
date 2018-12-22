@@ -33,6 +33,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.List;
 
 @RunWith(JUnit4.class)
 public class TestDivrollEntity extends TestCase {
@@ -822,7 +823,7 @@ public class TestDivrollEntity extends TestCase {
     adminRole.create();
 
     DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+    adminUser.setAcl(DivrollACL.buildPublicReadWrite());
     adminUser.getRoles().add(adminRole);
     adminUser.create("admin", "password");
 
@@ -863,12 +864,24 @@ public class TestDivrollEntity extends TestCase {
       e.printStackTrace();
     }
 
+    adminUser.setLink("userProfile", userProfile.getEntityId());
+    List<DivrollEntity> userProfiles  = adminUser.links("userProfile");
+    userProfiles.forEach(entity -> {
+        System.out.println(entity.getEntityId());
+        System.out.println(entity.getProperty("nickname"));
+    });
+    assertNotNull(userProfiles);
+    Assert.assertFalse(userProfiles.isEmpty());
+
     Assert.assertNotNull(userProfile.getProperty("linkNames"));
     Assert.assertTrue(((List) userProfile.getProperty("linkNames")).contains("user"));
 
     List<DivrollEntity> entities = userProfile.links("user");
     Assert.assertNotNull(entities);
     Assert.assertFalse(entities.isEmpty());
+
+
+
 
     for (DivrollEntity entity : entities) {}
 

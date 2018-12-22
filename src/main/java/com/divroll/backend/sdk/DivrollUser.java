@@ -52,6 +52,14 @@ public class DivrollUser extends DivrollBase {
   private DivrollACL acl;
   private List<DivrollRole> roles;
 
+  private List<String> linkNames;
+  private List<String> blobNames;
+  private String dateCreated;
+  private String dateUpdated;
+  private List<DivrollLink> links;
+  private String linkName;
+  private String linkFrom;
+
   public void create(String username, String password) {
     try {
 
@@ -340,7 +348,114 @@ public class DivrollUser extends DivrollBase {
     }
   }
 
-  public List<DivrollEntity> retrieveLinked(List<String> linkNames) {
+    public List<DivrollEntity> links(String linkName) {
+        List<DivrollEntity> entities = new LinkedList<DivrollEntity>();
+        if (entityId == null) {
+            throw new DivrollException("Save the entity first before getting links");
+        }
+        try {
+            String completeUrl =
+                    Divroll.getServerUrl() + usersUrl + "/" + getEntityId() + "/links/" + linkName;
+
+            GetRequest getRequest = (GetRequest) Unirest.get(completeUrl);
+
+            if (Divroll.getMasterKey() != null) {
+                getRequest.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
+            }
+            if (Divroll.getAppId() != null) {
+                getRequest.header(HEADER_APP_ID, Divroll.getAppId());
+            }
+            if (Divroll.getApiKey() != null) {
+                getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
+            }
+            if (Divroll.getAuthToken() != null) {
+                getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
+            }
+            if (Divroll.getNameSpace() != null) {
+                getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+            }
+            HttpResponse<JsonNode> response = getRequest.asJson();
+
+            if (response.getStatus() >= 500) {
+                throwException(response);
+            } else if (response.getStatus() == 401) {
+                throw new UnauthorizedException(response.getStatusText());
+            } else if (response.getStatus() == 400) {
+                throw new BadRequestException(response.getStatusText());
+            } else if (response.getStatus() >= 400) {
+                throwException(response);
+            } else if (response.getStatus() == 200) {
+
+                JsonNode body = response.getBody();
+                JSONObject bodyObj = body.getObject();
+                JSONObject entitiesJSONObject = bodyObj.getJSONObject("entities");
+                JSONArray results = entitiesJSONObject.getJSONArray("results");
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject jsonObject = results.getJSONObject(i);
+                    DivrollEntity divrollEntity = new DivrollEntity(jsonObject.getString("entityType"));
+                    JSONObject entityJSONObject = results.getJSONObject(i);
+                    Iterator<String> it = entityJSONObject.keySet().iterator();
+                    while (it.hasNext()) {
+                        String propertyKey = it.next();
+                        if (propertyKey.equals("entityId")) {
+                            divrollEntity.setEntityId(entityJSONObject.getString(propertyKey));
+                        } else if (propertyKey.equals("publicRead")) {
+                            try {
+                                Boolean value = entityJSONObject.getBoolean("publicRead");
+                                divrollEntity.getAcl().setPublicRead(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else if (propertyKey.equals("publicWrite")) {
+                            try {
+                                Boolean value = entityJSONObject.getBoolean("publicWrite");
+                                divrollEntity.getAcl().setPublicWrite(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else if (propertyKey.equals("aclRead")) {
+                            try {
+                                List<String> value =
+                                        JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclRead"));
+                                divrollEntity.getAcl().setAclRead(value);
+                            } catch (Exception e) {
+
+                            }
+                            try {
+                                List<String> value = Arrays.asList(entityJSONObject.getString("aclRead"));
+                                divrollEntity.getAcl().setAclRead(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else if (propertyKey.equals("aclWrite")) {
+                            try {
+                                List<String> value =
+                                        JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclWrite"));
+                                divrollEntity.getAcl().setAclWrite(value);
+                            } catch (Exception e) {
+
+                            }
+                            try {
+                                List<String> value = Arrays.asList(entityJSONObject.getString("aclWrite"));
+                                divrollEntity.getAcl().setAclWrite(value);
+                            } catch (Exception e) {
+
+                            }
+                        } else {
+                            divrollEntity.setProperty(propertyKey, entityJSONObject.get(propertyKey));
+                        }
+                    }
+                    entities.add(divrollEntity);
+                }
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return entities;
+    }
+
+
+    public List<DivrollEntity> retrieveLinked(List<String> linkNames) {
     List<DivrollEntity> divrollEntities = new LinkedList<>();
     try {
       GetRequest getRequest =
@@ -1071,4 +1186,62 @@ public class DivrollUser extends DivrollBase {
     }
   }
 
+    public List<String> getLinkNames() {
+        return linkNames;
+    }
+
+    public void setLinkNames(List<String> linkNames) {
+        this.linkNames = linkNames;
+    }
+
+    public List<String> getBlobNames() {
+        return blobNames;
+    }
+
+    public void setBlobNames(List<String> blobNames) {
+        this.blobNames = blobNames;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(String dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
+
+    public List<DivrollLink> getLinks() {
+        if(links == null) {
+            links = new LinkedList<DivrollLink>();
+        }
+        return links;
+    }
+
+    public void setLinks(List<DivrollLink> links) {
+        this.links = links;
+    }
+
+    public String getLinkName() {
+        return linkName;
+    }
+
+    public void setLinkName(String linkName) {
+        this.linkName = linkName;
+    }
+
+    public String getLinkFrom() {
+        return linkFrom;
+    }
+
+    public void setLinkFrom(String linkFrom) {
+        this.linkFrom = linkFrom;
+    }
 }

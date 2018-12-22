@@ -47,11 +47,21 @@ public class DivrollEntity extends DivrollBase {
   private String entityId;
   private DivrollACL acl;
   protected JSONObject entityObj = new JSONObject();
+  private String entityType;
+
+  private List<String> linkNames;
+  private List<String> blobNames;
+  private String dateCreated;
+  private String dateUpdated;
+  private List<DivrollLink> links;
+  private String linkName;
+  private String linkFrom;
 
   private DivrollEntity() {}
 
   public DivrollEntity(String entityStore) {
-    entityStoreBase = entityStoreBase + entityStore;
+      entityType = entityStore;
+      entityStoreBase = entityStoreBase + entityStore;
   }
 
   public byte[] getBlobProperty(String blobKey) {
@@ -1043,4 +1053,70 @@ public class DivrollEntity extends DivrollBase {
     entityObj.put(propertyKey, propertyValue);
   }
 
+  public JSONObject getProperties() {
+      return entityObj;
+  }
+
+  public String getEntityType() {
+      return entityType;
+  }
+
+    public List<String> getLinkNames() {
+        return linkNames;
+    }
+
+    public void setLinkNames(List<String> linkNames) {
+        this.linkNames = linkNames;
+    }
+
+    public List<String> getBlobNames() {
+        return blobNames;
+    }
+
+    public void setBlobNames(List<String> blobNames) {
+        this.blobNames = blobNames;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(String dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
+
+    public List<DivrollLink> getLinks() {
+        if(links == null) {
+            links = new LinkedList<DivrollLink>();
+        }
+        return links;
+    }
+
+    public void setLinks(List<DivrollLink> links) {
+        this.links = links;
+    }
+
+    public String getLinkName() {
+        return linkName;
+    }
+
+    public void setLinkName(String linkName) {
+        this.linkName = linkName;
+    }
+
+    public String getLinkFrom() {
+        return linkFrom;
+    }
+
+    public void setLinkFrom(String linkFrom) {
+        this.linkFrom = linkFrom;
+    }
 }

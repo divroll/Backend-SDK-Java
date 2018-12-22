@@ -38,16 +38,19 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DivrollEntities extends DivrollBase {
+public class DivrollEntities extends LinkableDivrollBase {
 
   private String entityStoreUrl = "/entities/";
 
   private List<DivrollEntity> entities;
-  private int skip;
-  private int limit;
+  private Integer skip;
+  private Integer limit;
   private Boolean count;
   private Long result;
+  private String sort;
   private String entityStore;
+  private List<String> include;
+  private String authToken;
 
   private DivrollEntities() {}
 
@@ -109,6 +112,24 @@ public class DivrollEntities extends DivrollBase {
       if(count != null) {
         getRequest.queryString("count", Boolean.valueOf(count));
       }
+
+      if(sort != null) {
+          getRequest.queryString("sort", sort);
+      }
+
+        if (include != null && !include.isEmpty()) {
+            JSONArray linkNameArray = new JSONArray();
+            for (String linkName : include) {
+                linkNameArray.put(linkName);
+            }
+            getRequest.queryString("include", linkNameArray.toString());
+        }
+
+        if (authToken != null && !authToken.isEmpty()) {
+            getRequest.queryString("authToken", authToken);
+        }
+
+
       HttpResponse<JsonNode> response = getRequest.asJson();
 
       if (response.getStatus() >= 500) {
@@ -186,6 +207,44 @@ public class DivrollEntities extends DivrollBase {
               divrollEntity.setProperty(propertyKey, entityJSONObject.get(propertyKey));
             }
           }
+
+            try{
+                String dateCreated = entityJSONObject.getString("dateCreated");
+                divrollEntity.setDateCreated(dateCreated);
+            } catch (Exception e) {
+
+            }
+
+            try{
+                String dateUpdated = entityJSONObject.getString("dateUpdated");
+                divrollEntity.setDateUpdated(dateUpdated);
+            } catch (Exception e) {
+
+            }
+
+            JSONArray links = null;
+            try{
+                links = entityJSONObject.getJSONArray("links");
+            } catch (Exception e) {
+
+            }
+            if(links != null) {
+                for(int j=0;j<links.length();j++) {
+                    JSONObject linksObj = links.getJSONObject(j);
+                    DivrollLink divrollLink = processLink(linksObj);
+                    divrollEntity.getLinks().add(divrollLink);
+                }
+            } else {
+                JSONObject linksObj = null;
+                try{
+                    linksObj = entityJSONObject.getJSONObject("links");
+                } catch (Exception e) {
+
+                }
+                DivrollLink divrollLink = processLink(linksObj);
+                divrollEntity.getLinks().add(divrollLink);
+            }
+
           getEntities().add(divrollEntity);
         }
       }
@@ -205,4 +264,17 @@ public class DivrollEntities extends DivrollBase {
   public Long getResult() {
     return result;
   }
+
+  public void setSort(String sort) {
+      this.sort = sort;
+  }
+
+  public void setInclude(List<String> include) {
+      this.include = include;
+  }
+
+  public void setAuthToken(String authToken) {
+      this.authToken = authToken;
+  }
+
 }
