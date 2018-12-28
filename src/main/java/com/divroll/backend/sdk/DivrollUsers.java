@@ -120,6 +120,17 @@ public class DivrollUsers extends LinkableDivrollBase {
               getRequest.queryString("queries", filter.toString());
           }
 
+          if (skip != null) {
+              getRequest.queryString("skip", String.valueOf(getSkip()));
+          }
+          if (limit != null) {
+              getRequest.queryString("limit", String.valueOf(getLimit()));
+          }
+
+          if (count != null) {
+              getRequest.queryString("count", String.valueOf(count));
+          }
+
           if(sort != null) {
               getRequest.queryString("sort", sort);
           }
@@ -243,6 +254,12 @@ public class DivrollUsers extends LinkableDivrollBase {
                       // do nothing
                   }
 
+                  try{
+                      result = userObj.getLong("count");
+                  } catch (Exception e) {
+
+                  }
+
                   DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
                   acl.setPublicWrite(publicWrite);
                   acl.setPublicRead(publicRead);
@@ -323,5 +340,9 @@ public class DivrollUsers extends LinkableDivrollBase {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
+    }
+
+    public Long getResult() {
+        return result;
     }
 }

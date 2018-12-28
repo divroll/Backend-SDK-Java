@@ -287,63 +287,78 @@ public class DivrollEntity extends DivrollBase {
 
         JsonNode body = response.getBody();
         JSONObject bodyObj = body.getObject();
-        JSONObject entitiesJSONObject = bodyObj.getJSONObject("entities");
-        JSONArray results = entitiesJSONObject.getJSONArray("results");
-        for (int i = 0; i < results.length(); i++) {
-          DivrollEntity divrollEntity = new DivrollEntity();
-          JSONObject entityJSONObject = results.getJSONObject(i);
-          Iterator<String> it = entityJSONObject.keySet().iterator();
-          while (it.hasNext()) {
-            String propertyKey = it.next();
-            if (propertyKey.equals("entityId")) {
-              divrollEntity.setEntityId(entityJSONObject.getString(propertyKey));
-            } else if (propertyKey.equals("publicRead")) {
-              try {
-                Boolean value = entityJSONObject.getBoolean("publicRead");
-                divrollEntity.getAcl().setPublicRead(value);
-              } catch (Exception e) {
+        JSONObject entitiesJSONObject = null;
+        JSONArray results = null;
 
-              }
-            } else if (propertyKey.equals("publicWrite")) {
-              try {
-                Boolean value = entityJSONObject.getBoolean("publicWrite");
-                divrollEntity.getAcl().setPublicWrite(value);
-              } catch (Exception e) {
+        try{
+            entitiesJSONObject = bodyObj.getJSONObject("entities");
+        } catch (Exception e) {
 
-              }
-            } else if (propertyKey.equals("aclRead")) {
-              try {
-                List<String> value =
-                    JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclRead"));
-                divrollEntity.getAcl().setAclRead(value);
-              } catch (Exception e) {
+        }
 
-              }
-              try {
-                List<String> value = Arrays.asList(entityJSONObject.getString("aclRead"));
-                divrollEntity.getAcl().setAclRead(value);
-              } catch (Exception e) {
+        try{
+            results = entitiesJSONObject.getJSONArray("results");
+        } catch (Exception e) {
+        }
 
-              }
-            } else if (propertyKey.equals("aclWrite")) {
-              try {
-                List<String> value =
-                    JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclWrite"));
-                divrollEntity.getAcl().setAclWrite(value);
-              } catch (Exception e) {
+        if(results != null) {
+            for (int i = 0; i < results.length(); i++) {
+                DivrollEntity divrollEntity = new DivrollEntity();
+                JSONObject entityJSONObject = results.getJSONObject(i);
+                Iterator<String> it = entityJSONObject.keySet().iterator();
+                while (it.hasNext()) {
+                    String propertyKey = it.next();
+                    if (propertyKey.equals("entityId")) {
+                        divrollEntity.setEntityId(entityJSONObject.getString(propertyKey));
+                    } else if (propertyKey.equals("publicRead")) {
+                        try {
+                            Boolean value = entityJSONObject.getBoolean("publicRead");
+                            divrollEntity.getAcl().setPublicRead(value);
+                        } catch (Exception e) {
 
-              }
-              try {
-                List<String> value = Arrays.asList(entityJSONObject.getString("aclWrite"));
-                divrollEntity.getAcl().setAclWrite(value);
-              } catch (Exception e) {
+                        }
+                    } else if (propertyKey.equals("publicWrite")) {
+                        try {
+                            Boolean value = entityJSONObject.getBoolean("publicWrite");
+                            divrollEntity.getAcl().setPublicWrite(value);
+                        } catch (Exception e) {
 
-              }
-            } else {
-              divrollEntity.setProperty(propertyKey, entityJSONObject.get(propertyKey));
+                        }
+                    } else if (propertyKey.equals("aclRead")) {
+                        try {
+                            List<String> value =
+                                    JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclRead"));
+                            divrollEntity.getAcl().setAclRead(value);
+                        } catch (Exception e) {
+
+                        }
+                        try {
+                            List<String> value = Arrays.asList(entityJSONObject.getString("aclRead"));
+                            divrollEntity.getAcl().setAclRead(value);
+                        } catch (Exception e) {
+
+                        }
+                    } else if (propertyKey.equals("aclWrite")) {
+                        try {
+                            List<String> value =
+                                    JSON.aclJSONArrayToList(entityJSONObject.getJSONArray("aclWrite"));
+                            divrollEntity.getAcl().setAclWrite(value);
+                        } catch (Exception e) {
+
+                        }
+                        try {
+                            List<String> value = Arrays.asList(entityJSONObject.getString("aclWrite"));
+                            divrollEntity.getAcl().setAclWrite(value);
+                        } catch (Exception e) {
+
+                        }
+                    } else {
+                        divrollEntity.setProperty(propertyKey, entityJSONObject.get(propertyKey));
+                    }
+                }
+                entities.add(divrollEntity);
             }
-          }
-          entities.add(divrollEntity);
+
         }
       }
     } catch (UnirestException e) {

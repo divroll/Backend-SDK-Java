@@ -41,8 +41,9 @@ public class DivrollRoles extends DivrollBase {
   private static final String rolesUrl = "/entities/roles";
 
   private List<DivrollRole> roles;
-  private int skip;
-  private int limit;
+  private Long skip;
+  private Long limit;
+  private Long count;
 
   public List<DivrollRole> getRoles() {
     if (roles == null) {
@@ -55,19 +56,19 @@ public class DivrollRoles extends DivrollBase {
     this.roles = roles;
   }
 
-  public int getSkip() {
+  public Long getSkip() {
     return skip;
   }
 
-  public void setSkip(int skip) {
+  public void setSkip(Long skip) {
     this.skip = skip;
   }
 
-  public int getLimit() {
+  public Long getLimit() {
     return limit;
   }
 
-  public void setLimit(int limit) {
+  public void setLimit(Long limit) {
     this.limit = limit;
   }
 
@@ -90,6 +91,20 @@ public class DivrollRoles extends DivrollBase {
       if (Divroll.getNameSpace() != null) {
         getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
       }
+
+
+        if (skip != null) {
+            getRequest.queryString("skip", String.valueOf(getSkip()));
+        }
+        if (limit != null) {
+            getRequest.queryString("limit", String.valueOf(getLimit()));
+        }
+
+        if (count != null) {
+            getRequest.queryString("count", String.valueOf(count));
+        }
+
+
       HttpResponse<JsonNode> response = getRequest.asJson();
 
       if (response.getStatus() >= 500) {

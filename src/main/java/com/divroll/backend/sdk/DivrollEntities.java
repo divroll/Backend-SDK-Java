@@ -117,6 +117,14 @@ public class DivrollEntities extends LinkableDivrollBase {
           getRequest.queryString("sort", sort);
       }
 
+        if (skip != null) {
+            getRequest.queryString("skip", String.valueOf(getSkip()));
+        }
+        if (limit != null) {
+            getRequest.queryString("limit", String.valueOf(getLimit()));
+        }
+
+
         if (include != null && !include.isEmpty()) {
             JSONArray linkNameArray = new JSONArray();
             for (String linkName : include) {
