@@ -35,7 +35,6 @@ import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +55,8 @@ public class DivrollEntity extends DivrollBase {
   private List<DivrollLink> links;
   private String linkName;
   private String linkFrom;
+
+  private List<String> uniqueProperties = new LinkedList<>();
 
   private DivrollEntity() {}
 
@@ -231,6 +232,13 @@ public class DivrollEntity extends DivrollBase {
       DivrollPropertyValue divrollPropertyValue = new DivrollPropertyValue(propertyValue);
       entityObj.put(propertyName, divrollPropertyValue.getValue());
     }
+  }
+
+  public void setProperty(String propertyName, Object propertyValue, boolean isUnique) {
+    if(isUnique && !uniqueProperties.contains(propertyName)) {
+      uniqueProperties.add(propertyName);
+    }
+    setProperty(propertyName, propertyValue);
   }
 
   public Object getProperty(String propertyName) {
@@ -820,7 +828,14 @@ public class DivrollEntity extends DivrollBase {
       httpRequestWithBody.header("X-Divroll-ACL-Write", aclWrite.toString());
       httpRequestWithBody.header("Content-Type", "application/json");
 
-      System.out.println("BODY - " + body.toString());
+      JSONArray uniquePropertiesArray = new JSONArray();
+      uniqueProperties.forEach(uniqueProperty -> {
+        uniquePropertiesArray.put(uniqueProperty);
+      });
+
+      if(uniquePropertiesArray.length() > 0) {
+        httpRequestWithBody.queryString("uniqueProperties", uniquePropertiesArray.toString());
+      }
 
       HttpResponse<JsonNode> response = httpRequestWithBody.body(body).asJson();
 
@@ -1133,5 +1148,12 @@ public class DivrollEntity extends DivrollBase {
 
     public void setLinkFrom(String linkFrom) {
         this.linkFrom = linkFrom;
+    }
+
+    public void setUniqueProperties(List<String> uniqueProperties) {
+      if(uniqueProperties == null) {
+        return;
+      }
+      this.uniqueProperties = uniqueProperties;
     }
 }

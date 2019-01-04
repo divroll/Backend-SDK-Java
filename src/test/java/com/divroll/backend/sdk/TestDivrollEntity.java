@@ -24,6 +24,8 @@ package com.divroll.backend.sdk;
 import com.divroll.backend.sdk.exception.NotFoundRequestException;
 import com.divroll.backend.sdk.exception.UnauthorizedException;
 import junit.framework.TestCase;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -893,4 +895,63 @@ public class TestDivrollEntity extends TestCase {
 
     userProfile.delete();
   }
+
+  @Test
+  public void testCreateEntityWithJSONObjectProperty() {
+    TestApplication application = TestData.getNewApplication();
+    Divroll.initialize(application.getAppId(), application.getApiToken());
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("name", "Sample Name");
+    jsonObject.put("age", 100L);
+
+    DivrollEntity sampleEntity = new DivrollEntity("Sample");
+    sampleEntity.put("person", jsonObject);
+    sampleEntity.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+    sampleEntity.create();
+
+    assertNotNull(sampleEntity.getEntityId());
+
+    DivrollEntities sampleEntities = new DivrollEntities("Sample");
+    sampleEntities.query();
+    List<DivrollEntity> list = sampleEntities.getEntities();
+    assertEquals(1, sampleEntities.getEntities().size());
+    list.forEach(entity -> {
+      System.out.println(entity.toString());
+    });
+  }
+
+  @Test
+  public void testCreateEntityWithJSONArrayProperty() {
+    TestApplication application = TestData.getNewApplication();
+    Divroll.initialize(application.getAppId(), application.getApiToken());
+
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("name", "Sample Name");
+    jsonObject.put("age", 100L);
+
+    JSONArray jsonArray = new JSONArray();
+    jsonArray.put(jsonObject);
+
+    DivrollEntity sampleEntity = new DivrollEntity("Sample");
+    sampleEntity.put("persons", jsonArray);
+    sampleEntity.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+    sampleEntity.create();
+
+    assertNotNull(sampleEntity.getEntityId());
+
+    DivrollEntities sampleEntities = new DivrollEntities("Sample");
+    sampleEntities.query();
+    List<DivrollEntity> list = sampleEntities.getEntities();
+    assertEquals(1, sampleEntities.getEntities().size());
+    list.forEach(entity -> {
+      List personList = (LinkedList) entity.getProperty("persons");
+      assertEquals(1, personList.size());
+      Map<String,Object> personMap = (Map<String, Object>) personList.iterator().next();
+      personMap.forEach((key,value) -> {
+        System.out.println(key + " " + value);
+      });
+    });
+  }
+
 }
