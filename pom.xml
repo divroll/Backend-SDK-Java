@@ -24,10 +24,11 @@
         </plugins>
     </build>
     <distributionManagement>
-        <repository>
-            <id>internal</id>
-            <url>file://${project.build.directory}/mvn-repo</url>
-        </repository>
+        <snapshotRepository>
+            <id>bintray-divroll-maven</id>
+            <name>oss-jfrog-artifactory-snapshots</name>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+        </snapshotRepository>
     </distributionManagement>
     <packaging>jar</packaging>
     <name>Backend-SDK-Java</name>
