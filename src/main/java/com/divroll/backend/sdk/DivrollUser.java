@@ -139,9 +139,9 @@ public class DivrollUser extends DivrollBase {
         JSONObject bodyObj = responseBody.getObject();
         JSONObject responseUser = bodyObj.getJSONObject("user");
         String entityId = responseUser.getString("entityId");
-        String webToken = responseUser.getString("webToken");
+        String authToken = responseUser.getString("authToken");
         setEntityId(entityId);
-        setAuthToken(webToken);
+        setAuthToken(authToken);
 
         List<String> aclWriteList = null;
         List<String> aclReadList = null;
@@ -679,7 +679,7 @@ public class DivrollUser extends DivrollBase {
         JSONObject bodyObj = responseBody.getObject();
         JSONObject responseUser = bodyObj.getJSONObject("user");
         String entityId = responseUser.getString("entityId");
-        // String webToken = responseUser.getString("webToken");
+        // String authToken = responseUser.getString("authToken");
         String updatedUsername = null;
 
         try {
@@ -689,7 +689,7 @@ public class DivrollUser extends DivrollBase {
         }
 
         setEntityId(entityId);
-        // setAuthToken(webToken);
+        // setAuthToken(authToken);
 
         Boolean publicRead = null;
         Boolean publicWrite = null;
@@ -852,10 +852,10 @@ public class DivrollUser extends DivrollBase {
         JSONObject bodyObj = body.getObject();
         JSONObject user = bodyObj.getJSONObject("user");
         String entityId = user.getString("entityId");
-        String webToken = user.getString("webToken");
+        String authToken = user.getString("authToken");
         setEntityId(entityId);
-        setAuthToken(webToken);
-        Divroll.setAuthToken(webToken);
+        setAuthToken(authToken);
+        Divroll.setAuthToken(authToken);
       }
     } catch (UnirestException e) {
       e.printStackTrace();
