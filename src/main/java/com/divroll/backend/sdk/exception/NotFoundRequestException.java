@@ -22,7 +22,7 @@
 package com.divroll.backend.sdk.exception;
 
 public class NotFoundRequestException extends DivrollException {
-  public NotFoundRequestException(String mesage) {
-    super(mesage);
-  }
+	public NotFoundRequestException(String mesage) {
+		super(mesage);
+	}
 }

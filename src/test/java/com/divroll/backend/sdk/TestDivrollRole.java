@@ -21,9 +21,8 @@
  */
 package com.divroll.backend.sdk;
 
-import com.divroll.backend.sdk.exception.BadRequestException;
-import com.divroll.backend.sdk.exception.UnauthorizedException;
-import junit.framework.TestCase;
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,694 +30,693 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.Arrays;
+import com.divroll.backend.sdk.exception.BadRequestException;
+import com.divroll.backend.sdk.exception.UnauthorizedException;
+
+import junit.framework.TestCase;
 
 @RunWith(JUnit4.class)
 public class TestDivrollRole extends TestCase {
 
-  @Rule public final ExpectedException exception = ExpectedException.none();
-
-  @Test
-  public void testCreateRolePublic() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
-
-    role.retrieve();
-  }
-
-  @Test(expected = BadRequestException.class)
-  public void testCreateRoleInvalidACLShouldThrowException() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-
-    DivrollRole role = new DivrollRole("Admin");
-    DivrollACL acl = DivrollACL.build();
-    acl.setAclWrite(Arrays.asList("")); // invalid
-    acl.setAclRead(Arrays.asList("")); // invalid
-    role.setAcl(acl);
-    role.create();
-
-    Assert.assertNotNull(role.getEntityId());
-  }
-
-  @Test
-  public void testCreateRoleMasterKey() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(null);
-    role.create();
-
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertFalse(role.getAcl().getPublicRead());
-    Assert.assertFalse(role.getAcl().getPublicWrite());
-  }
-
-  @Test(expected = UnauthorizedException.class)
-  public void testCreateRoleMasterKeyOnlyShouldThrowException() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(null);
-    role.create();
-
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertFalse(role.getAcl().getPublicRead());
-    Assert.assertFalse(role.getAcl().getPublicWrite());
-
-    // This wil throw exception since the created Role has
-    // Master Key-only access
-    role.retrieve();
-  }
-
-  @Test
-  public void testCreateRoleMasterKeyOnly() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(
-        application.getAppId(), application.getApiToken(), application.getMasterKey());
-
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildMasterKeyOnly());
-    role.create();
-
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertFalse(role.getAcl().getPublicRead());
-    Assert.assertFalse(role.getAcl().getPublicWrite());
-
-    role.retrieve();
-
-    assertNotNull(role.getEntityId());
-    assertNotNull(role.getName());
-  }
-
-  @Test(expected = UnauthorizedException.class)
-  public void testCreateRoleInvalidAppId() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize("WRONG", application.getApiToken());
-    DivrollRole role = new DivrollRole("Admin");
-    role.create();
-  }
-
-  @Test(expected = UnauthorizedException.class)
-  public void testCreateRoleInvalidApiToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), "WRONG");
-    DivrollRole role = new DivrollRole("Admin");
-    role.create();
-  }
-
-  @Test
-  public void testCreateRoleInvalidMasterKey() {
-    // TODO
-  }
-
-  @Test(expected = UnauthorizedException.class)
-  public void testGetRoleInvalidAppId() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-    DivrollRole role = new DivrollRole("Admin");
-    role.create();
-
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertNotNull(role.getAcl());
-    Assert.assertNotNull(role.getName());
-
-    Divroll.initialize("WRONG", application.getApiToken());
-    role.retrieve();
-    Assert.assertNull(role.getEntityId());
-    Assert.assertNull(role.getAcl());
-    Assert.assertNull(role.getName());
-  }
-
-  @Test(expected = UnauthorizedException.class)
-  public void testGetRoleInvalidApiToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-    DivrollRole role = new DivrollRole("Admin");
-    role.create();
-
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertNotNull(role.getAcl());
-    Assert.assertNotNull(role.getName());
-
-    Divroll.initialize(application.getAppId(), "WRONG");
-    role.retrieve();
-    Assert.assertNull(role.getEntityId());
-    Assert.assertNull(role.getAcl());
-    Assert.assertNull(role.getName());
-  }
-
-  @Test
-  public void testGetRoleInvalidMasterKey() {
-    // TODO
-  }
-
-  @Test
-  public void testCreateAndGetRoleWithACLUsingAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-
-    DivrollUser divrollUser = new DivrollUser();
-    divrollUser.create("admin", "password");
-
-    Assert.assertNotNull(divrollUser.getEntityId());
-
-    String userId = divrollUser.getEntityId();
-
-    DivrollRole divrollRole = new DivrollRole();
-    DivrollACL divrollACL = DivrollACL.build();
-    divrollACL.setPublicRead(true);
-    divrollACL.setAclWrite(Arrays.asList(userId));
-
-    divrollRole.setAcl(divrollACL);
-    divrollRole.setName("Admin");
-    divrollRole.create();
-
-    Assert.assertNotNull(divrollRole.getEntityId());
-    Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
-    Assert.assertTrue(divrollRole.getAcl().getPublicRead());
-
-    divrollUser.login("admin", "password");
-    Assert.assertNotNull(divrollUser.getAuthToken());
-    Assert.assertNotNull(Divroll.getAuthToken());
-
-    divrollRole.retrieve();
-    //
-    Assert.assertNotNull(divrollRole.getEntityId());
-    Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
-    Assert.assertTrue(divrollRole.getAcl().getPublicRead());
-  }
-
-  @Test(expected = UnauthorizedException.class)
-  public void testCreateAndGetRoleWithACLMissingAuthTokenShouldFail() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-
-    DivrollUser divrollUser = new DivrollUser();
-    divrollUser.create("admin", "password");
-
-    Assert.assertNotNull(divrollUser.getEntityId());
-
-    String userId = divrollUser.getEntityId();
-
-    DivrollRole divrollRole = new DivrollRole();
-    DivrollACL divrollACL = DivrollACL.build();
-    divrollACL.setAclRead(Arrays.asList(userId));
-    divrollACL.setAclWrite(Arrays.asList(userId));
-
-    divrollRole.setAcl(divrollACL);
-    divrollRole.setName("Admin");
-    divrollRole.create();
-
-    Assert.assertNotNull(divrollRole.getEntityId());
-    Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
-    Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
-
-    divrollRole.retrieve();
-
-    Assert.assertNotNull(divrollRole.getEntityId());
-    Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
-    Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
-  }
+	@Rule
+	public final ExpectedException exception = ExpectedException.none();
+
+	@Test
+	public void testCreateRolePublic() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
+
+		role.retrieve();
+	}
+
+	@Test(expected = BadRequestException.class)
+	public void testCreateRoleInvalidACLShouldThrowException() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+
+		DivrollRole role = new DivrollRole("Admin");
+		DivrollACL acl = DivrollACL.build();
+		acl.setAclWrite(Arrays.asList("")); // invalid
+		acl.setAclRead(Arrays.asList("")); // invalid
+		role.setAcl(acl);
+		role.create();
+
+		Assert.assertNotNull(role.getEntityId());
+	}
+
+	@Test
+	public void testCreateRoleMasterKey() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(null);
+		role.create();
+
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertFalse(role.getAcl().getPublicRead());
+		Assert.assertFalse(role.getAcl().getPublicWrite());
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void testCreateRoleMasterKeyOnlyShouldThrowException() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(null);
+		role.create();
+
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertFalse(role.getAcl().getPublicRead());
+		Assert.assertFalse(role.getAcl().getPublicWrite());
+
+		// This wil throw exception since the created Role has
+		// Master Key-only access
+		role.retrieve();
+	}
+
+	@Test
+	public void testCreateRoleMasterKeyOnly() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
+
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildMasterKeyOnly());
+		role.create();
+
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertFalse(role.getAcl().getPublicRead());
+		Assert.assertFalse(role.getAcl().getPublicWrite());
+
+		role.retrieve();
+
+		assertNotNull(role.getEntityId());
+		assertNotNull(role.getName());
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void testCreateRoleInvalidAppId() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize("WRONG", application.getApiToken());
+		DivrollRole role = new DivrollRole("Admin");
+		role.create();
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void testCreateRoleInvalidApiToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), "WRONG");
+		DivrollRole role = new DivrollRole("Admin");
+		role.create();
+	}
+
+	@Test
+	public void testCreateRoleInvalidMasterKey() {
+		// TODO
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void testGetRoleInvalidAppId() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+		DivrollRole role = new DivrollRole("Admin");
+		role.create();
+
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertNotNull(role.getAcl());
+		Assert.assertNotNull(role.getName());
+
+		Divroll.initialize("WRONG", application.getApiToken());
+		role.retrieve();
+		Assert.assertNull(role.getEntityId());
+		Assert.assertNull(role.getAcl());
+		Assert.assertNull(role.getName());
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void testGetRoleInvalidApiToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+		DivrollRole role = new DivrollRole("Admin");
+		role.create();
+
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertNotNull(role.getAcl());
+		Assert.assertNotNull(role.getName());
+
+		Divroll.initialize(application.getAppId(), "WRONG");
+		role.retrieve();
+		Assert.assertNull(role.getEntityId());
+		Assert.assertNull(role.getAcl());
+		Assert.assertNull(role.getName());
+	}
+
+	@Test
+	public void testGetRoleInvalidMasterKey() {
+		// TODO
+	}
+
+	@Test
+	public void testCreateAndGetRoleWithACLUsingAuthToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+
+		DivrollUser divrollUser = new DivrollUser();
+		divrollUser.create("admin", "password");
+
+		Assert.assertNotNull(divrollUser.getEntityId());
+
+		String userId = divrollUser.getEntityId();
+
+		DivrollRole divrollRole = new DivrollRole();
+		DivrollACL divrollACL = DivrollACL.build();
+		divrollACL.setPublicRead(true);
+		divrollACL.setAclWrite(Arrays.asList(userId));
+
+		divrollRole.setAcl(divrollACL);
+		divrollRole.setName("Admin");
+		divrollRole.create();
+
+		Assert.assertNotNull(divrollRole.getEntityId());
+		Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+		Assert.assertTrue(divrollRole.getAcl().getPublicRead());
+
+		divrollUser.login("admin", "password");
+		Assert.assertNotNull(divrollUser.getAuthToken());
+		Assert.assertNotNull(Divroll.getAuthToken());
+
+		divrollRole.retrieve();
+		//
+		Assert.assertNotNull(divrollRole.getEntityId());
+		Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+		Assert.assertTrue(divrollRole.getAcl().getPublicRead());
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void testCreateAndGetRoleWithACLMissingAuthTokenShouldFail() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+
+		DivrollUser divrollUser = new DivrollUser();
+		divrollUser.create("admin", "password");
+
+		Assert.assertNotNull(divrollUser.getEntityId());
+
+		String userId = divrollUser.getEntityId();
+
+		DivrollRole divrollRole = new DivrollRole();
+		DivrollACL divrollACL = DivrollACL.build();
+		divrollACL.setAclRead(Arrays.asList(userId));
+		divrollACL.setAclWrite(Arrays.asList(userId));
+
+		divrollRole.setAcl(divrollACL);
+		divrollRole.setName("Admin");
+		divrollRole.create();
+
+		Assert.assertNotNull(divrollRole.getEntityId());
+		Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+		Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
+
+		divrollRole.retrieve();
 
-  @Test
-  public void testUpdatePublicRoleMissingAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
-
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		Assert.assertNotNull(divrollRole.getEntityId());
+		Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+		Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
+	}
 
-    String roleId = role.getEntityId();
+	@Test
+	public void testUpdatePublicRoleMissingAuthToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    role.setName("Super Admin");
-    role.update();
+		String roleId = role.getEntityId();
 
-    role.retrieve();
-
-    Assert.assertEquals("Super Admin", role.getName());
-  }
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-  @Test(expected = UnauthorizedException.class)
-  public void testUpdateRoleWithACLMissingAuthTokenShouldFail() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		role.setName("Super Admin");
+		role.update();
 
-    DivrollUser divrollUser = new DivrollUser();
-    divrollUser.create("admin", "password");
+		role.retrieve();
 
-    Assert.assertNotNull(divrollUser.getEntityId());
+		Assert.assertEquals("Super Admin", role.getName());
+	}
 
-    String userId = divrollUser.getEntityId();
+	@Test(expected = UnauthorizedException.class)
+	public void testUpdateRoleWithACLMissingAuthTokenShouldFail() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    DivrollRole divrollRole = new DivrollRole();
-    DivrollACL divrollACL = DivrollACL.build();
-    divrollACL.setAclRead(Arrays.asList(userId));
-    divrollACL.setAclWrite(Arrays.asList(userId));
+		DivrollUser divrollUser = new DivrollUser();
+		divrollUser.create("admin", "password");
 
-    divrollRole.setAcl(divrollACL);
-    divrollRole.setName("Admin");
-    divrollRole.create();
+		Assert.assertNotNull(divrollUser.getEntityId());
 
-    Assert.assertNotNull(divrollRole.getEntityId());
-    Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
-    Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
+		String userId = divrollUser.getEntityId();
 
-    divrollRole.setName("Super Admin");
-    divrollRole.update();
+		DivrollRole divrollRole = new DivrollRole();
+		DivrollACL divrollACL = DivrollACL.build();
+		divrollACL.setAclRead(Arrays.asList(userId));
+		divrollACL.setAclWrite(Arrays.asList(userId));
 
-    Assert.assertNotNull(divrollRole.getEntityId());
-    Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
-    Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
-  }
+		divrollRole.setAcl(divrollACL);
+		divrollRole.setName("Admin");
+		divrollRole.create();
 
-  @Test
-  public void testUpdatePublicRoleUsingAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		Assert.assertNotNull(divrollRole.getEntityId());
+		Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+		Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		divrollRole.setName("Super Admin");
+		divrollRole.update();
 
-    String roleId = role.getEntityId();
+		Assert.assertNotNull(divrollRole.getEntityId());
+		Assert.assertTrue(divrollRole.getAcl().getAclWrite().contains("0-0"));
+		Assert.assertTrue(divrollRole.getAcl().getAclRead().contains("0-0"));
+	}
 
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+	@Test
+	public void testUpdatePublicRoleUsingAuthToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    DivrollUser divrollUser = new DivrollUser();
-    divrollUser.create("admin", "password");
-    divrollUser.login("admin", "password");
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    role.setName("Super Admin");
-    role.update();
+		String roleId = role.getEntityId();
 
-    role.retrieve();
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-    Assert.assertEquals("Super Admin", role.getName());
-  }
+		DivrollUser divrollUser = new DivrollUser();
+		divrollUser.create("admin", "password");
+		divrollUser.login("admin", "password");
 
-  @Test
-  public void testUpdatePublicRoleUsingMasterKey() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(
-        application.getAppId(), application.getApiToken(), application.getMasterKey());
+		role.setName("Super Admin");
+		role.update();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		role.retrieve();
 
-    String roleId = role.getEntityId();
+		Assert.assertEquals("Super Admin", role.getName());
+	}
 
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+	@Test
+	public void testUpdatePublicRoleUsingMasterKey() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    role.setName("Super Admin");
-    role.update();
+		String roleId = role.getEntityId();
 
-    role.retrieve();
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-    Assert.assertEquals("Super Admin", role.getName());
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
-  }
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-  @Test
-  public void testUpdatePublicRoleChangeACLUsingMasterKey() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(
-        application.getAppId(), application.getApiToken(), application.getMasterKey());
+		role.setName("Super Admin");
+		role.update();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		role.retrieve();
 
-    String roleId = role.getEntityId();
+		Assert.assertEquals("Super Admin", role.getName());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
+	}
 
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+	@Test
+	public void testUpdatePublicRoleChangeACLUsingMasterKey() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    role.setAcl(DivrollACL.buildMasterKeyOnly());
-    role.update();
+		String roleId = role.getEntityId();
 
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertFalse(role.getAcl().getPublicRead());
-    Assert.assertFalse(role.getAcl().getPublicWrite());
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-    role.retrieve();
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertFalse(role.getAcl().getPublicRead());
-    Assert.assertFalse(role.getAcl().getPublicWrite());
-  }
+		role.setAcl(DivrollACL.buildMasterKeyOnly());
+		role.update();
 
-  @Test
-  public void testUpdatePublicRoleChangeACLUsingAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertFalse(role.getAcl().getPublicRead());
+		Assert.assertFalse(role.getAcl().getPublicWrite());
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		role.retrieve();
 
-    String roleId = role.getEntityId();
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertFalse(role.getAcl().getPublicRead());
+		Assert.assertFalse(role.getAcl().getPublicWrite());
+	}
 
-    Assert.assertNotNull(role.getEntityId());
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+	@Test
+	public void testUpdatePublicRoleChangeACLUsingAuthToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    Assert.assertTrue(role.getAcl().getPublicRead());
-    Assert.assertTrue(role.getAcl().getPublicWrite());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    role.setAcl(DivrollACL.buildMasterKeyOnly());
-    role.update();
+		String roleId = role.getEntityId();
 
-    Assert.assertEquals("Admin", role.getName());
-    Assert.assertFalse(role.getAcl().getPublicRead());
-    Assert.assertFalse(role.getAcl().getPublicWrite());
-  }
+		Assert.assertNotNull(role.getEntityId());
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-  @Test
-  public void testCreateUserWithRole() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		Assert.assertTrue(role.getAcl().getPublicRead());
+		Assert.assertTrue(role.getAcl().getPublicWrite());
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    role.create();
+		role.setAcl(DivrollACL.buildMasterKeyOnly());
+		role.update();
 
-    String adminRoleId = role.getEntityId();
+		Assert.assertEquals("Admin", role.getName());
+		Assert.assertFalse(role.getAcl().getPublicRead());
+		Assert.assertFalse(role.getAcl().getPublicWrite());
+	}
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.getRoles().add(role);
-    adminUser.create("admin", "password");
-  }
+	@Test
+	public void testCreateUserWithRole() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-  @Test
-  public void testCreateUserWithRoles() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		role.create();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    role.create();
+		String adminRoleId = role.getEntityId();
 
-    DivrollRole managerRole = new DivrollRole("Manager");
-    managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    managerRole.create();
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.getRoles().add(role);
+		adminUser.create("admin", "password");
+	}
 
-    String adminRoleId = role.getEntityId();
+	@Test
+	public void testCreateUserWithRoles() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.getRoles().add(role);
-    adminUser.getRoles().add(managerRole);
-    adminUser.create("admin", "password");
-  }
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		role.create();
 
-  @Test(expected = BadRequestException.class)
-  public void testCreateUserWithRolesThenUpdateRoleWithoutAuthTokenShouldFail() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		DivrollRole managerRole = new DivrollRole("Manager");
+		managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		managerRole.create();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    role.create();
+		String adminRoleId = role.getEntityId();
 
-    DivrollRole managerRole = new DivrollRole("Manager");
-    managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    managerRole.create();
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.getRoles().add(role);
+		adminUser.getRoles().add(managerRole);
+		adminUser.create("admin", "password");
+	}
 
-    String adminRoleId = role.getEntityId();
+	@Test(expected = BadRequestException.class)
+	public void testCreateUserWithRolesThenUpdateRoleWithoutAuthTokenShouldFail() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.getRoles().add(role);
-    adminUser.getRoles().add(managerRole);
-    adminUser.create("admin", "password");
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		role.create();
 
-    Assert.assertNotNull(adminUser.getEntityId());
+		DivrollRole managerRole = new DivrollRole("Manager");
+		managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		managerRole.create();
 
-    adminUser.setRoles(Arrays.asList(managerRole));
-    adminUser.update();
-  }
+		String adminRoleId = role.getEntityId();
 
-  @Test
-  public void testCreateUserWithRolesThenUpdateRole() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.getRoles().add(role);
+		adminUser.getRoles().add(managerRole);
+		adminUser.create("admin", "password");
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    role.create();
+		Assert.assertNotNull(adminUser.getEntityId());
 
-    DivrollRole managerRole = new DivrollRole("Manager");
-    managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    managerRole.create();
+		adminUser.setRoles(Arrays.asList(managerRole));
+		adminUser.update();
+	}
 
-    String adminRoleId = role.getEntityId();
+	@Test
+	public void testCreateUserWithRolesThenUpdateRole() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.getRoles().add(role);
-    adminUser.getRoles().add(managerRole);
-    adminUser.create("admin", "password");
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		role.create();
 
-    Assert.assertEquals(2, adminUser.getRoles().size());
+		DivrollRole managerRole = new DivrollRole("Manager");
+		managerRole.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		managerRole.create();
 
-    adminUser.login("admin", "password");
+		String adminRoleId = role.getEntityId();
 
-    Assert.assertNotNull(adminUser.getEntityId());
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.getRoles().add(role);
+		adminUser.getRoles().add(managerRole);
+		adminUser.create("admin", "password");
 
-    adminUser.setRoles(Arrays.asList(managerRole));
-    adminUser.update();
+		Assert.assertEquals(2, adminUser.getRoles().size());
 
-    Assert.assertEquals(1, adminUser.getRoles().size());
-  }
+		adminUser.login("admin", "password");
 
-  @Test
-  public void testUpdateUserWithAuthTokenWithRole() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		Assert.assertNotNull(adminUser.getEntityId());
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    role.create();
+		adminUser.setRoles(Arrays.asList(managerRole));
+		adminUser.update();
 
-    String adminRoleId = role.getEntityId();
+		Assert.assertEquals(1, adminUser.getRoles().size());
+	}
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.getRoles().add(role);
-    adminUser.create("admin", "password");
+	@Test
+	public void testUpdateUserWithAuthTokenWithRole() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    DivrollUser divrollUser = new DivrollUser();
-    DivrollACL userACL = new DivrollACL();
-    userACL.setPublicRead(true);
-    userACL.setPublicWrite(false);
-    userACL.setAclWrite(Arrays.asList(adminRoleId));
-    divrollUser.setAcl(userACL);
-    divrollUser.create("user", "password");
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		role.create();
 
-    Assert.assertNotNull(adminUser.getRoles());
-    Assert.assertFalse(adminUser.getRoles().isEmpty());
+		String adminRoleId = role.getEntityId();
 
-    adminUser.login("admin", "password");
-    String authToken = adminUser.getAuthToken();
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.getRoles().add(role);
+		adminUser.create("admin", "password");
 
-    Assert.assertNotNull(authToken);
-    Assert.assertNotNull(Divroll.getAuthToken());
+		DivrollUser divrollUser = new DivrollUser();
+		DivrollACL userACL = new DivrollACL();
+		userACL.setPublicRead(true);
+		userACL.setPublicWrite(false);
+		userACL.setAclWrite(Arrays.asList(adminRoleId));
+		divrollUser.setAcl(userACL);
+		divrollUser.create("user", "password");
 
-    divrollUser.update("new_username", "new_password");
-    Assert.assertEquals("new_username", divrollUser.getUsername());
-  }
+		Assert.assertNotNull(adminUser.getRoles());
+		Assert.assertFalse(adminUser.getRoles().isEmpty());
 
-  @Test
-  public void testDeletePublicRole() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		adminUser.login("admin", "password");
+		String authToken = adminUser.getAuthToken();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		Assert.assertNotNull(authToken);
+		Assert.assertNotNull(Divroll.getAuthToken());
 
-    Assert.assertNotNull(role.getEntityId());
+		divrollUser.update("new_username", "new_password");
+		Assert.assertEquals("new_username", divrollUser.getUsername());
+	}
 
-    role.delete();
-  }
+	@Test
+	public void testDeletePublicRole() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-  @Test(expected = BadRequestException.class)
-  public void testDeletePublicRoleThenRetrieveShouldFail() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		Assert.assertNotNull(role.getEntityId());
 
-    Assert.assertNotNull(role.getEntityId());
+		role.delete();
+	}
 
-    role.delete();
+	@Test(expected = BadRequestException.class)
+	public void testDeletePublicRoleThenRetrieveShouldFail() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    role.retrieve();
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    Assert.assertNull(role.getEntityId());
-  }
+		Assert.assertNotNull(role.getEntityId());
 
-  @Test
-  public void testDeletePublicRoleWithAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		role.delete();
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.create("admin", "password");
+		role.retrieve();
 
-    adminUser.login("admin", "password");
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		Assert.assertNull(role.getEntityId());
+	}
 
-    Assert.assertNotNull(role.getEntityId());
+	@Test
+	public void testDeletePublicRoleWithAuthToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    adminUser.login("admin", "password");
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.create("admin", "password");
 
-    role.delete();
-  }
+		adminUser.login("admin", "password");
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-  @Test(expected = BadRequestException.class)
-  public void testDeletePublicRoleWithAuthTokenThenRetrieveShouldFail() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		Assert.assertNotNull(role.getEntityId());
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.create("admin", "password");
+		adminUser.login("admin", "password");
 
-    adminUser.login("admin", "password");
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		role.delete();
+	}
 
-    Assert.assertNotNull(role.getEntityId());
+	@Test(expected = BadRequestException.class)
+	public void testDeletePublicRoleWithAuthTokenThenRetrieveShouldFail() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    adminUser.login("admin", "password");
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.create("admin", "password");
 
-    role.delete();
+		adminUser.login("admin", "password");
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    role.retrieve();
+		Assert.assertNotNull(role.getEntityId());
 
-    Assert.assertNull(role.getEntityId());
-  }
+		adminUser.login("admin", "password");
 
-  @Test
-  public void testDeletePublicRoleWithMasterKey() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(
-        application.getAppId(), application.getApiToken(), application.getMasterKey());
+		role.delete();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		role.retrieve();
 
-    Assert.assertNotNull(role.getEntityId());
+		Assert.assertNull(role.getEntityId());
+	}
 
-    role.delete();
-  }
+	@Test
+	public void testDeletePublicRoleWithMasterKey() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-  @Test(expected = BadRequestException.class)
-  public void testDeletePublicRoleWithMasterKeyTheRetrieveShouldFail() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(
-        application.getAppId(), application.getApiToken(), application.getMasterKey());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadWrite());
-    role.create();
+		Assert.assertNotNull(role.getEntityId());
 
-    Assert.assertNotNull(role.getEntityId());
+		role.delete();
+	}
 
-    role.delete();
+	@Test(expected = BadRequestException.class)
+	public void testDeletePublicRoleWithMasterKeyTheRetrieveShouldFail() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken(), application.getMasterKey());
 
-    role.retrieve();
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadWrite());
+		role.create();
 
-    Assert.assertNull(role.getEntityId());
-  }
+		Assert.assertNotNull(role.getEntityId());
 
-  @Test(expected = UnauthorizedException.class)
-  public void testDeleteRoleWithACLWithAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		role.delete();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    role.create();
+		role.retrieve();
 
-    String adminRoleId = role.getEntityId();
+		Assert.assertNull(role.getEntityId());
+	}
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.getRoles().add(role);
-    adminUser.create("admin", "password");
+	@Test(expected = UnauthorizedException.class)
+	public void testDeleteRoleWithACLWithAuthToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
 
-    Assert.assertNotNull(adminUser.getRoles());
-    Assert.assertFalse(adminUser.getRoles().isEmpty());
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		role.create();
 
-    adminUser.login("admin", "password");
-    String authToken = adminUser.getAuthToken();
+		String adminRoleId = role.getEntityId();
 
-    Assert.assertNotNull(authToken);
-    Assert.assertNotNull(Divroll.getAuthToken());
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.getRoles().add(role);
+		adminUser.create("admin", "password");
 
-    role.delete();
-  }
+		Assert.assertNotNull(adminUser.getRoles());
+		Assert.assertFalse(adminUser.getRoles().isEmpty());
 
-  @Test(expected = UnauthorizedException.class)
-  public void testDeleteRoleWithACLWithoutAuthToken() {
-    TestApplication application = TestData.getNewApplication();
-    Divroll.initialize(application.getAppId(), application.getApiToken());
+		adminUser.login("admin", "password");
+		String authToken = adminUser.getAuthToken();
 
-    DivrollRole role = new DivrollRole("Admin");
-    role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
-    role.create();
+		Assert.assertNotNull(authToken);
+		Assert.assertNotNull(Divroll.getAuthToken());
 
-    DivrollUser adminUser = new DivrollUser();
-    adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
-    adminUser.getRoles().add(role);
-    adminUser.create("admin", "password");
+		role.delete();
+	}
 
-    role.delete();
-  }
+	@Test(expected = UnauthorizedException.class)
+	public void testDeleteRoleWithACLWithoutAuthToken() {
+		TestApplication application = TestData.getNewApplication();
+		Divroll.initialize(application.getAppId(), application.getApiToken());
+
+		DivrollRole role = new DivrollRole("Admin");
+		role.setAcl(DivrollACL.buildPublicReadMasterKeyWrite());
+		role.create();
+
+		DivrollUser adminUser = new DivrollUser();
+		adminUser.setAcl(DivrollACL.buildMasterKeyOnly());
+		adminUser.getRoles().add(role);
+		adminUser.create("admin", "password");
+
+		role.delete();
+	}
 }

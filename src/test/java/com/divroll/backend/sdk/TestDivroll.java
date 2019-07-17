@@ -21,4 +21,5 @@
  */
 package com.divroll.backend.sdk;
 
-public class TestDivroll {}
+public class TestDivroll {
+}

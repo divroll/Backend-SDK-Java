@@ -22,7 +22,7 @@
 package com.divroll.backend.sdk.exception;
 
 public class DivrollException extends RuntimeException {
-  public DivrollException(String mesage) {
-    super(mesage);
-  }
+	public DivrollException(String mesage) {
+		super(mesage);
+	}
 }

@@ -22,7 +22,7 @@
 package com.divroll.backend.sdk.exception;
 
 public class UnauthorizedException extends DivrollException {
-  public UnauthorizedException(String mesage) {
-    super(mesage);
-  }
+	public UnauthorizedException(String mesage) {
+		super(mesage);
+	}
 }

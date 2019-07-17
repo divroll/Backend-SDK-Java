@@ -22,7 +22,7 @@
 package com.divroll.backend.sdk.exception;
 
 public class BadRequestException extends DivrollException {
-  public BadRequestException(String mesage) {
-    super(mesage);
-  }
+	public BadRequestException(String mesage) {
+		super(mesage);
+	}
 }

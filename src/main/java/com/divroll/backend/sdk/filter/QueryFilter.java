@@ -22,5 +22,5 @@
 package com.divroll.backend.sdk.filter;
 
 public interface QueryFilter {
-    String toString();
+	String toString();
 }

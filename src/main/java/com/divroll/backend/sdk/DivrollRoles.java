@@ -21,6 +21,13 @@
  */
 package com.divroll.backend.sdk;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.divroll.backend.sdk.exception.BadRequestException;
 import com.divroll.backend.sdk.exception.UnauthorizedException;
 import com.divroll.backend.sdk.helper.JSON;
@@ -29,150 +36,142 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 public class DivrollRoles extends DivrollBase {
 
-  private static final String rolesUrl = "/entities/roles";
+	private static final String rolesUrl = "/entities/roles";
 
-  private List<DivrollRole> roles;
-  private Long skip;
-  private Long limit;
-  private Long count;
+	private List<DivrollRole> roles;
+	private Long skip;
+	private Long limit;
+	private Long count;
 
-  public List<DivrollRole> getRoles() {
-    if (roles == null) {
-      roles = new LinkedList<DivrollRole>();
-    }
-    return roles;
-  }
+	public List<DivrollRole> getRoles() {
+		if (roles == null) {
+			roles = new LinkedList<DivrollRole>();
+		}
+		return roles;
+	}
 
-  public void setRoles(List<DivrollRole> roles) {
-    this.roles = roles;
-  }
+	public void setRoles(List<DivrollRole> roles) {
+		this.roles = roles;
+	}
 
-  public Long getSkip() {
-    return skip;
-  }
+	public Long getSkip() {
+		return skip;
+	}
 
-  public void setSkip(Long skip) {
-    this.skip = skip;
-  }
+	public void setSkip(Long skip) {
+		this.skip = skip;
+	}
 
-  public Long getLimit() {
-    return limit;
-  }
+	public Long getLimit() {
+		return limit;
+	}
 
-  public void setLimit(Long limit) {
-    this.limit = limit;
-  }
+	public void setLimit(Long limit) {
+		this.limit = limit;
+	}
 
-  public void query() {
-    try {
-      GetRequest getRequest = (GetRequest) Unirest.get(Divroll.getServerUrl() + rolesUrl);
+	public void query() {
+		try {
+			GetRequest getRequest = Unirest.get(Divroll.getServerUrl() + rolesUrl);
 
-      if (Divroll.getMasterKey() != null) {
-        getRequest.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
-      }
-      if (Divroll.getAppId() != null) {
-        getRequest.header(HEADER_APP_ID, Divroll.getAppId());
-      }
-      if (Divroll.getApiKey() != null) {
-        getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
-      }
-      if (Divroll.getAuthToken() != null) {
-        getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
-      }
-      if (Divroll.getNameSpace() != null) {
-        getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
-      }
+			if (Divroll.getMasterKey() != null) {
+				getRequest.header(HEADER_MASTER_KEY, Divroll.getMasterKey());
+			}
+			if (Divroll.getAppId() != null) {
+				getRequest.header(HEADER_APP_ID, Divroll.getAppId());
+			}
+			if (Divroll.getApiKey() != null) {
+				getRequest.header(HEADER_API_KEY, Divroll.getApiKey());
+			}
+			if (Divroll.getAuthToken() != null) {
+				getRequest.header(HEADER_AUTH_TOKEN, Divroll.getAuthToken());
+			}
+			if (Divroll.getNameSpace() != null) {
+				getRequest.header(HEADER_NAMESPACE, Divroll.getNameSpace());
+			}
 
+			if (skip != null) {
+				getRequest.queryString("skip", String.valueOf(getSkip()));
+			}
+			if (limit != null) {
+				getRequest.queryString("limit", String.valueOf(getLimit()));
+			}
 
-        if (skip != null) {
-            getRequest.queryString("skip", String.valueOf(getSkip()));
-        }
-        if (limit != null) {
-            getRequest.queryString("limit", String.valueOf(getLimit()));
-        }
+			if (count != null) {
+				getRequest.queryString("count", String.valueOf(count));
+			}
 
-        if (count != null) {
-            getRequest.queryString("count", String.valueOf(count));
-        }
+			HttpResponse<JsonNode> response = getRequest.asJson();
 
+			if (response.getStatus() >= 500) {
+				throwException(response);
+			} else if (response.getStatus() == 401) {
+				throw new UnauthorizedException(response.getStatusText());
+			} else if (response.getStatus() == 400) {
+				throw new BadRequestException(response.getStatusText());
+			} else if (response.getStatus() >= 400) {
+				throwException(response);
+			} else if (response.getStatus() == 200) {
 
-      HttpResponse<JsonNode> response = getRequest.asJson();
+				getRoles().clear();
 
-      if (response.getStatus() >= 500) {
-        throwException(response);
-      } else if (response.getStatus() == 401) {
-        throw new UnauthorizedException(response.getStatusText());
-      } else if (response.getStatus() == 400) {
-        throw new BadRequestException(response.getStatusText());
-      } else if (response.getStatus() >= 400) {
-        throwException(response);
-      } else if (response.getStatus() == 200) {
+				JsonNode body = response.getBody();
+				JSONObject bodyObj = body.getObject();
+				JSONObject roles = bodyObj.getJSONObject("roles");
+				JSONArray results = roles.getJSONArray("results");
+				for (int i = 0; i < results.length(); i++) {
+					JSONObject roleObj = results.getJSONObject(i);
+					String entityId = roleObj.getString("entityId");
+					String name = roleObj.getString("name");
+					Boolean publicRead = roleObj.getBoolean("publicRead");
+					Boolean publicWrite = roleObj.getBoolean("publicWrite");
 
-        getRoles().clear();
+					List<String> aclWriteList = null;
+					List<String> aclReadList = null;
 
-        JsonNode body = response.getBody();
-        JSONObject bodyObj = body.getObject();
-        JSONObject roles = bodyObj.getJSONObject("roles");
-        JSONArray results = roles.getJSONArray("results");
-        for (int i = 0; i < results.length(); i++) {
-          JSONObject roleObj = results.getJSONObject(i);
-          String entityId = roleObj.getString("entityId");
-          String name = roleObj.getString("name");
-          Boolean publicRead = roleObj.getBoolean("publicRead");
-          Boolean publicWrite = roleObj.getBoolean("publicWrite");
+					try {
+						aclWriteList = JSON.aclJSONArrayToList(roleObj.getJSONArray("aclWrite"));
+					} catch (Exception e) {
 
-          List<String> aclWriteList = null;
-          List<String> aclReadList = null;
+					}
 
-          try {
-            aclWriteList = JSON.aclJSONArrayToList(roleObj.getJSONArray("aclWrite"));
-          } catch (Exception e) {
+					try {
+						aclReadList = JSON.aclJSONArrayToList(roleObj.getJSONArray("aclRead"));
+					} catch (Exception e) {
 
-          }
+					}
 
-          try {
-            aclReadList = JSON.aclJSONArrayToList(roleObj.getJSONArray("aclRead"));
-          } catch (Exception e) {
+					try {
+						aclWriteList = Arrays.asList(roleObj.getString("aclWrite"));
+					} catch (Exception e) {
 
-          }
+					}
 
-          try {
-            aclWriteList = Arrays.asList(roleObj.getString("aclWrite"));
-          } catch (Exception e) {
+					try {
+						aclReadList = Arrays.asList(roleObj.getString("aclRead"));
+					} catch (Exception e) {
 
-          }
+					}
 
-          try {
-            aclReadList = Arrays.asList(roleObj.getString("aclRead"));
-          } catch (Exception e) {
+					DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
+					acl.setPublicWrite(publicWrite);
+					acl.setPublicRead(publicRead);
 
-          }
+					DivrollRole role = new DivrollRole();
+					role.setEntityId(entityId);
+					role.setName(name);
+					role.setAcl(acl);
 
-          DivrollACL acl = new DivrollACL(aclReadList, aclWriteList);
-          acl.setPublicWrite(publicWrite);
-          acl.setPublicRead(publicRead);
+					getRoles().add(role);
+				}
+				//
 
-          DivrollRole role = new DivrollRole();
-          role.setEntityId(entityId);
-          role.setName(name);
-          role.setAcl(acl);
-
-          getRoles().add(role);
-        }
-        //
-
-      }
-    } catch (UnirestException e) {
-      e.printStackTrace();
-    }
-  }
+			}
+		} catch (UnirestException e) {
+			e.printStackTrace();
+		}
+	}
 }
